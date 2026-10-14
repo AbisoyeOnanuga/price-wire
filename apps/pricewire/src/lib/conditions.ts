@@ -81,6 +81,10 @@ export const MARKETPLACE_CONDITIONS: Array<{
   },
 ];
 
+export function needsConditionDetail(value: string): boolean {
+  return value !== "new_sealed" && value !== "new_open_box";
+}
+
 export function resolveMarketplaceCondition(value?: string) {
   const found =
     MARKETPLACE_CONDITIONS.find((c) => c.value === value) ??

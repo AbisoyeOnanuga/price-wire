@@ -24,8 +24,15 @@ Price Wire helps **electronics resellers** pick an initial list price by pooling
 
 ## DEV draft (staged)
 
-- Edit: https://dev.to/abisoye/price-wire-open-source-ai-comp-pooling-for-electronics-resellers-hf26-week-2-1504-temp-slug-2836614/edit
-- Article id: `4852980`
+- Created via DevRelay as **draft** (article id `4852980`, Oct 14 2026).
+- Edit URL (use this, not the temp public slug): https://dev.to/abisoye/price-wire-open-source-ai-comp-pooling-for-electronics-resellers-hf26-week-2-1504-temp-slug-2836614/edit
+- **Before publish:** add repo link, demo GIF/Render URL, listing-draft screenshot, Entire session embed.
+- `get_my_articles` may only list **published** posts; the Week 2 draft stays in DEV drafts until you publish.
+
+## DevRelay agent sessions
+
+- No Price Wire session submitted yet (`list_agent_sessions` only shows Trail Sketch Week 1 sessions).
+- **Next step:** save/submit a curated Cursor session via DevRelay `submit_agent_session`, or link an Entire checkpoint in the post (see `ENTIRE-SESSIONS.md`).
 
 ## Code
 

@@ -90,9 +90,33 @@
         <label>
           Condition
           <select id="condition" name="condition" aria-describedby="condition-hint">
-            <!-- populated from /api/conditions -->
+            <option value="new_sealed">New — sealed in box</option>
+            <option value="new_open_box">New — open box</option>
+            <option value="like_new">Like new</option>
+            <option value="excellent">Excellent</option>
+            <option value="very_good">Very good</option>
+            <option value="good" selected>Good</option>
+            <option value="acceptable">Acceptable</option>
+            <option value="fair">Fair</option>
+            <option value="poor">Poor</option>
+            <option value="for_parts">For parts / not working</option>
+            <option value="manufacturer_refurbished">Manufacturer refurbished</option>
+            <option value="seller_refurbished">Seller refurbished</option>
           </select>
           <span id="condition-hint" class="field-hint"></span>
+        </label>
+        <label id="condition-detail-wrap" class="condition-detail-wrap hidden">
+          Condition details
+          <textarea
+            id="condition-detail"
+            name="condition_detail"
+            rows="3"
+            placeholder="Scratches on corner, battery health 87%, includes original box but no cable…"
+          ></textarea>
+          <span class="field-hint"
+            >Used in your listing description. Helps buyers trust the price—especially for used
+            items.</span
+          >
         </label>
         <button type="submit" id="submit-btn">
           <span class="btn-label">Get price &amp; listing draft</span>
@@ -101,6 +125,6 @@
 
       <section id="results" class="card panel-results hidden" aria-live="polite"></section>
     </main>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="/main.ts"></script>
   </body>
 </html>

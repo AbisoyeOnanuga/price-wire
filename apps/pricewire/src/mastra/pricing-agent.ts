@@ -84,6 +84,7 @@ export const mastra = new Mastra({
 export async function runPricingPipeline(
   title: string,
   conditionHint?: string,
+  conditionDetail?: string,
 ): Promise<PriceQuote> {
   const marketplace = resolveMarketplaceCondition(conditionHint);
   const specs = await extractSpecs(title, marketplace.pricing_grade);
@@ -118,6 +119,7 @@ export async function runPricingPipeline(
     prediction,
     compsOut,
     marketplace.value,
+    conditionDetail,
   );
 
   return PriceQuoteSchema.parse({

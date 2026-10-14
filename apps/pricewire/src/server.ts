@@ -53,7 +53,11 @@ app.get("/api/health", (c) =>
 );
 
 app.post("/api/quote", async (c) => {
-  const body = await c.req.json<{ title?: string; condition?: string }>();
+  const body = await c.req.json<{
+    title?: string;
+    condition?: string;
+    condition_detail?: string;
+  }>();
   const title = body.title?.trim();
   if (!title) {
     return c.json({ error: "title is required" }, 400);
@@ -61,7 +65,7 @@ app.post("/api/quote", async (c) => {
 
   try {
     const quote = await tracePricingRun(title, () =>
-      runPricingPipeline(title, body.condition),
+      runPricingPipeline(title, body.condition, body.condition_detail),
     );
     return c.json(quote);
   } catch (err) {

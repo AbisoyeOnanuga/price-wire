@@ -51,9 +51,22 @@ const submitBtn = document.querySelector<HTMLButtonElement>("#submit-btn")!;
 const statusLine = document.querySelector<HTMLElement>("#integration-status")!;
 const conditionSelect = document.querySelector<HTMLSelectElement>("#condition")!;
 const conditionHint = document.querySelector<HTMLElement>("#condition-hint")!;
+const conditionDetailWrap = document.querySelector<HTMLElement>(
+  "#condition-detail-wrap",
+)!;
+const conditionDetailInput = document.querySelector<HTMLTextAreaElement>(
+  "#condition-detail",
+)!;
 const themeToggle = document.querySelector<HTMLButtonElement>("#theme-toggle")!;
 
 let conditionOptions: ConditionOption[] = [];
+
+conditionOptions = Array.from(conditionSelect.options).map((o) => ({
+  value: o.value,
+  label: o.textContent ?? o.value,
+  marketing_note: "",
+}));
+updateConditionHint();
 
 void loadHealth();
 void loadConditions();
@@ -79,25 +92,44 @@ function initTheme() {
 async function loadConditions() {
   try {
     const res = await fetch("/api/conditions");
+    if (!res.ok) throw new Error("conditions unavailable");
     conditionOptions = (await res.json()) as ConditionOption[];
-    conditionSelect.innerHTML = conditionOptions
-      .map(
-        (o) =>
-          `<option value="${escapeAttr(o.value)}">${escapeHtml(o.label)}</option>`,
-      )
-      .join("");
-    conditionSelect.value = "good";
-    updateConditionHint();
-    conditionSelect.addEventListener("change", updateConditionHint);
+    if (conditionOptions.length > 0) {
+      const prev = conditionSelect.value || "good";
+      conditionSelect.innerHTML = conditionOptions
+        .map(
+          (o) =>
+            `<option value="${escapeAttr(o.value)}">${escapeHtml(o.label)}</option>`,
+        )
+        .join("");
+      conditionSelect.value = conditionOptions.some((c) => c.value === prev)
+        ? prev
+        : "good";
+    }
   } catch {
-    conditionSelect.innerHTML =
-      '<option value="good">Good</option><option value="like_new">Like new</option>';
+    /* static <option> list in index.html is the fallback */
+    conditionOptions = Array.from(conditionSelect.options).map((o) => ({
+      value: o.value,
+      label: o.textContent ?? o.value,
+      marketing_note: "",
+    }));
   }
+  updateConditionHint();
+  conditionSelect.addEventListener("change", updateConditionHint);
+}
+
+function needsConditionDetail(value: string): boolean {
+  return value !== "new_sealed" && value !== "new_open_box";
 }
 
 function updateConditionHint() {
   const match = conditionOptions.find((c) => c.value === conditionSelect.value);
   conditionHint.textContent = match?.marketing_note ?? "";
+  const showDetail = needsConditionDetail(conditionSelect.value);
+  conditionDetailWrap.classList.toggle("hidden", !showDetail);
+  if (!showDetail) {
+    conditionDetailInput.value = "";
+  }
 }
 
 async function loadHealth() {
@@ -122,6 +154,9 @@ form.addEventListener("submit", async (e) => {
     document.querySelector<HTMLInputElement>("#title")!.value ?? ""
   ).trim();
   const condition = conditionSelect.value;
+  const condition_detail = needsConditionDetail(condition)
+    ? conditionDetailInput.value.trim()
+    : "";
 
   submitBtn.disabled = true;
   results.classList.remove("hidden");
@@ -136,7 +171,7 @@ form.addEventListener("submit", async (e) => {
     const res = await fetch("/api/quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, condition }),
+      body: JSON.stringify({ title, condition, condition_detail }),
     });
     const data = (await res.json()) as Quote & { error?: string };
     if (!res.ok) {

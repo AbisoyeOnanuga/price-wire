@@ -121,6 +121,7 @@ export function buildListingDraft(
   prediction: PricePrediction,
   comps: CompRow[],
   marketplaceConditionValue: string,
+  conditionDetail?: string,
 ): ListingDraft {
   const cond = resolveMarketplaceCondition(marketplaceConditionValue);
   const shipping = estimateShipping(rawTitle, specs);
@@ -164,7 +165,9 @@ export function buildListingDraft(
       : "Please see photos for exactly what is included.",
     "",
     "Condition details",
-    "Photos show actual item. Message me with questions before buying.",
+    conditionDetail?.trim()
+      ? conditionDetail.trim()
+      : "Photos show actual item. Message me with questions before buying.",
     "",
     "Pricing context",
     `${soldRange} Listed at $${prediction.suggested_price} (quick sale ~$${prediction.quick_sale_price}, firm hold ~$${prediction.hold_price}).`,
