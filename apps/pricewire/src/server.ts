@@ -8,6 +8,7 @@ import { cors } from "hono/cors";
 import { config } from "./config.js";
 import { runPricingPipeline } from "./mastra/pricing-agent.js";
 import { initSentry, tracePricingRun } from "./lib/sentry.js";
+import { MARKETPLACE_CONDITIONS } from "./lib/conditions.js";
 import { seedFromCsv } from "./tools/comp-store.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,6 +29,16 @@ initSentry();
 
 const app = new Hono();
 app.use("/api/*", cors());
+
+app.get("/api/conditions", (c) =>
+  c.json(
+    MARKETPLACE_CONDITIONS.map(({ value, label, marketing_note }) => ({
+      value,
+      label,
+      marketing_note,
+    })),
+  ),
+);
 
 app.get("/api/health", (c) =>
   c.json({

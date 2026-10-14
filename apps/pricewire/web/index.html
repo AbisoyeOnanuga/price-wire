@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,35 +11,65 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/style.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem("pricewire-theme");
+        if (t === "light" || t === "dark") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div class="grid-noise" aria-hidden="true"></div>
     <main class="shell">
+      <div class="top-bar">
+        <span class="wordmark">Price Wire</span>
+        <button
+          type="button"
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="Toggle light and dark theme"
+        >
+          <span class="theme-toggle-label">Theme</span>
+        </button>
+      </div>
+
       <header class="hero">
         <div class="hero-copy">
           <h1>Price <em>Wire</em></h1>
           <p class="lede">
-            Comp-backed list prices for electronics flippers. Paste your title,
-            get a band you can list today—grounded in pooled sales, not guesswork.
+            Set a fair list price for used electronics using real recent sales,
+            then start your marketplace listing with a title, description, and
+            shipping estimate you can edit before you publish.
           </p>
         </div>
-        <aside class="hero-ticker" aria-label="Example comp spread">
-          <div class="ticker-row">
-            <span class="tag">XM5</span>
-            <span class="up">$235</span>
-            <span class="muted">eBay · 4d</span>
-          </div>
-          <div class="ticker-row">
-            <span class="tag">i13</span>
-            <span class="up">$315</span>
-            <span class="muted">FB · 5d</span>
-          </div>
-          <div class="ticker-row">
-            <span class="tag">PS5</span>
-            <span class="up">$435</span>
-            <span class="muted">eBay · 8d</span>
-          </div>
-        </aside>
+        <figure class="sample-panel">
+          <figcaption>
+            <strong>Example sales (demo)</strong>
+            <span
+              >Illustrative prices from our sample dataset—not a live feed. Your
+              results use sales matched to your item.</span
+            >
+          </figcaption>
+          <ul class="sample-list">
+            <li>
+              <span class="tag">Headphones</span>
+              <span class="price">$235</span>
+              <span class="muted">eBay · sold in 4 days</span>
+            </li>
+            <li>
+              <span class="tag">Phone</span>
+              <span class="price">$315</span>
+              <span class="muted">Marketplace · 5 days</span>
+            </li>
+            <li>
+              <span class="tag">Console</span>
+              <span class="price">$435</span>
+              <span class="muted">eBay · 8 days</span>
+            </li>
+          </ul>
+        </figure>
       </header>
 
       <form id="quote-form" class="card panel-form">
@@ -48,7 +78,7 @@
           <p id="integration-status" class="status-line" aria-live="polite"></p>
         </div>
         <label>
-          Listing title
+          What are you selling?
           <input
             id="title"
             name="title"
@@ -59,15 +89,13 @@
         </label>
         <label>
           Condition
-          <select id="condition" name="condition">
-            <option value="like_new">Like new</option>
-            <option value="good" selected>Good</option>
-            <option value="fair">Fair</option>
-            <option value="new">New</option>
+          <select id="condition" name="condition" aria-describedby="condition-hint">
+            <!-- populated from /api/conditions -->
           </select>
+          <span id="condition-hint" class="field-hint"></span>
         </label>
         <button type="submit" id="submit-btn">
-          <span class="btn-label">Run comp wire</span>
+          <span class="btn-label">Get price &amp; listing draft</span>
         </button>
       </form>
 

@@ -5,7 +5,9 @@ import { z } from "zod";
 import { searchComps, upsertSerpComps } from "../tools/comp-store.js";
 import { extractSpecs } from "../tools/extract-specs.js";
 import { fetchSerpComps } from "../tools/serp-comps.js";
+import { confidenceLabel, pricingMethodLabel, resolveMarketplaceCondition } from "../lib/conditions.js";
 import { buildListingBrief } from "../tools/listing-brief.js";
+import { buildListingDraft } from "../tools/listing-draft.js";
 import { predictPrice } from "../tools/tabpfn-price.js";
 import type { PriceQuote } from "../types.js";
 import { PriceQuoteSchema } from "../types.js";
@@ -83,7 +85,8 @@ export async function runPricingPipeline(
   title: string,
   conditionHint?: string,
 ): Promise<PriceQuote> {
-  const specs = await extractSpecs(title, conditionHint);
+  const marketplace = resolveMarketplaceCondition(conditionHint);
+  const specs = await extractSpecs(title, marketplace.pricing_grade);
 
   const tigerComps = await searchComps(specs, 12);
   const serp = await fetchSerpComps(specs, 6);
@@ -102,11 +105,19 @@ export async function runPricingPipeline(
   const top = merged.slice(0, 15);
   const prediction = await predictPrice(specs, top.length ? top : tigerComps);
 
+  const compsOut = top.length ? top : tigerComps;
   const listing_brief = buildListingBrief(
     title,
     specs,
     prediction,
-    top.length ? top : tigerComps,
+    compsOut,
+  );
+  const listing_draft = buildListingDraft(
+    title,
+    specs,
+    prediction,
+    compsOut,
+    marketplace.value,
   );
 
   return PriceQuoteSchema.parse({
@@ -114,10 +125,13 @@ export async function runPricingPipeline(
     quick_sale_price: prediction.quick_sale_price,
     hold_price: prediction.hold_price,
     confidence: prediction.confidence,
+    confidence_label: confidenceLabel(prediction.confidence),
     comp_count: merged.length || tigerComps.length,
     method: prediction.method,
-    comps: top.length ? top : tigerComps,
+    method_label: pricingMethodLabel(prediction.method),
+    comps: compsOut,
     specs,
     listing_brief,
+    listing_draft,
   });
 }

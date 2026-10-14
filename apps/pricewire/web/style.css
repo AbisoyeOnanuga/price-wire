@@ -1,4 +1,5 @@
-:root {
+:root,
+html[data-theme="dark"] {
   color-scheme: dark;
   --bg: #0a0c0f;
   --bg-elevated: #12161c;
@@ -8,12 +9,26 @@
   --copper: #d4a574;
   --copper-dim: #8c6b4a;
   --signal: #7dd3a8;
-  --signal-dim: #3d6b56;
   --danger: #f0a8a8;
+  --noise: rgba(212, 165, 116, 0.04);
   --radius: 14px;
   --font-display: "Instrument Serif", Georgia, serif;
   --font-body: "DM Sans", "Segoe UI", sans-serif;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f3ed;
+  --bg-elevated: #fffdf8;
+  --ink: #1a1612;
+  --muted: #6b6358;
+  --line: #ddd5c8;
+  --copper: #a66b2e;
+  --copper-dim: #c49a6c;
+  --signal: #2d6b4f;
+  --danger: #b42318;
+  --noise: rgba(166, 107, 46, 0.06);
 }
 
 * {
@@ -34,8 +49,8 @@ body {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(212, 165, 116, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(212, 165, 116, 0.04) 1px, transparent 1px);
+    linear-gradient(var(--noise) 1px, transparent 1px),
+    linear-gradient(90deg, var(--noise) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(circle at 30% 20%, black, transparent 70%);
 }
@@ -45,6 +60,34 @@ body {
   max-width: 980px;
   margin: 0 auto;
   padding: clamp(1.5rem, 4vw, 3rem) 1.25rem 4rem;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.wordmark {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.theme-toggle {
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--copper-dim);
 }
 
 .hero {
@@ -81,17 +124,36 @@ body {
   font-size: 1.05rem;
 }
 
-.hero-ticker {
+.sample-panel {
+  margin: 0;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: linear-gradient(145deg, var(--bg-elevated), #0d1014);
+  background: var(--bg-elevated);
   padding: 0.85rem 1rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.ticker-row {
+.sample-panel figcaption {
   display: grid;
-  grid-template-columns: 3.5rem 1fr auto;
+  gap: 0.25rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.sample-panel figcaption strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.sample-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sample-list li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
   gap: 0.5rem;
   align-items: center;
   padding: 0.35rem 0;
@@ -99,8 +161,16 @@ body {
   font-size: 0.9rem;
 }
 
-.ticker-row:last-child {
+.sample-list li:last-child {
   border-bottom: none;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.4;
 }
 
 .tag {
@@ -110,7 +180,7 @@ body {
   font-size: 0.75rem;
 }
 
-.up {
+.price {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
@@ -293,9 +363,65 @@ button:disabled {
   color: var(--muted);
 }
 
-.meta-row code {
-  color: var(--signal);
+.draft-block {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.draft-block h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.draft-field {
+  margin-top: 0.75rem;
+}
+
+.draft-field label {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.draft-box {
+  margin-top: 0.35rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.specs-grid {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.spec-row {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.shipping-callout {
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px dashed var(--copper-dim);
   font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.warn {
+  color: var(--danger);
+  font-weight: 600;
 }
 
 .table-wrap {

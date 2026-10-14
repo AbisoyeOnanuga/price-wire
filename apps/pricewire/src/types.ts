@@ -37,15 +37,33 @@ export const CompRowSchema = z.object({
 });
 export type CompRow = z.infer<typeof CompRowSchema>;
 
+export const ListingDraftSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  item_specifics: z.record(z.string()),
+  shipping: z.object({
+    length_in: z.number(),
+    width_in: z.number(),
+    height_in: z.number(),
+    weight_lb: z.number(),
+    package_note: z.string(),
+  }),
+  condition_label: z.string(),
+  condition_marketing_tip: z.string(),
+});
+
 export const PriceQuoteSchema = z.object({
   suggested_price: z.number(),
   quick_sale_price: z.number(),
   hold_price: z.number(),
   confidence: z.enum(["low", "medium", "high"]),
+  confidence_label: z.string(),
   comp_count: z.number(),
   method: z.enum(["tabpfn", "median_fallback"]),
+  method_label: z.string(),
   comps: z.array(CompRowSchema),
   specs: ExtractedSpecsSchema,
   listing_brief: z.string(),
+  listing_draft: ListingDraftSchema,
 });
 export type PriceQuote = z.infer<typeof PriceQuoteSchema>;
