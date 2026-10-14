@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Price Wire — electronics resale pricing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="grid-noise" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <h1>Price <em>Wire</em></h1>
+          <p class="lede">
+            Comp-backed list prices for electronics flippers. Paste your title,
+            get a band you can list today—grounded in pooled sales, not guesswork.
+          </p>
+        </div>
+        <aside class="hero-ticker" aria-label="Example comp spread">
+          <div class="ticker-row">
+            <span class="tag">XM5</span>
+            <span class="up">$235</span>
+            <span class="muted">eBay · 4d</span>
+          </div>
+          <div class="ticker-row">
+            <span class="tag">i13</span>
+            <span class="up">$315</span>
+            <span class="muted">FB · 5d</span>
+          </div>
+          <div class="ticker-row">
+            <span class="tag">PS5</span>
+            <span class="up">$435</span>
+            <span class="muted">eBay · 8d</span>
+          </div>
+        </aside>
+      </header>
+
+      <form id="quote-form" class="card panel-form">
+        <div class="form-head">
+          <h2>New listing</h2>
+          <p id="integration-status" class="status-line" aria-live="polite"></p>
+        </div>
+        <label>
+          Listing title
+          <input
+            id="title"
+            name="title"
+            required
+            autocomplete="off"
+            placeholder="Sony WH-1000XM5 black like new"
+          />
+        </label>
+        <label>
+          Condition
+          <select id="condition" name="condition">
+            <option value="like_new">Like new</option>
+            <option value="good" selected>Good</option>
+            <option value="fair">Fair</option>
+            <option value="new">New</option>
+          </select>
+        </label>
+        <button type="submit" id="submit-btn">
+          <span class="btn-label">Run comp wire</span>
+        </button>
+      </form>
+
+      <section id="results" class="card panel-results hidden" aria-live="polite"></section>
+    </main>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

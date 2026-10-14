@@ -1,0 +1,47 @@
+title,brand,model_family,storage_gb,carrier_lock,condition_grade,includes_charger,platform,listed_price,sold_price,days_on_market,source
+Sony WH-1000XM5 Wireless Headphones Black,Sony,WH-1000XM5,,na,like_new,true,ebay,248.00,235.00,4,seed
+Sony WH-1000XM5 Noise Cancelling Headphones,Sony,WH-1000XM5,,na,good,false,facebook,220.00,210.00,6,seed
+Apple iPhone 13 128GB Unlocked Blue,Apple,iPhone 13,128,unlocked,good,true,ebay,329.00,315.00,5,seed
+iPhone 13 128gb unlocked excellent,Apple,iPhone 13,128,unlocked,like_new,true,facebook,340.00,325.00,3,seed
+Nintendo Switch OLED White Console,Nintendo,Switch OLED,,wifi_only,like_new,true,ebay,285.00,275.00,7,seed
+Nintendo Switch OLED w/ case,Nintendo,Switch OLED,,wifi_only,good,true,amazon,265.00,255.00,9,seed
+PlayStation 5 Disc Edition Console,Sony,PlayStation 5,,na,like_new,true,ebay,449.00,435.00,8,seed
+PS5 Disc Console + 2 controllers,Sony,PlayStation 5,,na,good,true,facebook,420.00,400.00,10,seed
+Apple MacBook Air M1 256GB Space Gray,Apple,MacBook Air M1,256,na,good,true,ebay,549.00,525.00,12,seed
+MacBook Air M1 8GB 256GB,Apple,MacBook Air M1,256,na,like_new,true,amazon,575.00,560.00,6,seed
+Samsung Galaxy S22 128GB Unlocked,Samsung,Galaxy S22,128,unlocked,good,true,ebay,279.00,265.00,5,seed
+Galaxy S22 128gb black unlocked,Samsung,Galaxy S22,128,unlocked,fair,false,facebook,240.00,225.00,11,seed
+Canon EOS R50 Mirrorless Camera Body,Canon,EOS R50,,na,like_new,false,ebay,599.00,585.00,14,seed
+Canon R50 mirrorless body only,Canon,EOS R50,,na,good,false,facebook,560.00,540.00,9,seed
+Apple iPad 10th Gen 64GB WiFi,Apple,iPad 10,64,wifi_only,like_new,true,ebay,299.00,289.00,4,seed
+iPad 10th generation 64gb silver,Apple,iPad 10,64,wifi_only,good,true,amazon,275.00,265.00,8,seed
+Meta Quest 3 128GB VR Headset,Meta,Quest 3,128,wifi_only,like_new,true,ebay,429.00,415.00,6,seed
+Oculus Quest 3 128GB,Meta,Quest 3,128,wifi_only,good,true,facebook,399.00,385.00,7,seed
+Apple AirPods Pro 2nd Gen USB-C,Apple,AirPods Pro 2,,na,like_new,true,ebay,169.00,162.00,3,seed
+AirPods Pro 2 USB-C,Apple,AirPods Pro 2,,na,good,false,facebook,155.00,148.00,5,seed
+DJI Mini 3 Pro Fly More Combo,DJI,Mini 3 Pro,,na,like_new,true,ebay,699.00,675.00,10,seed
+DJI Mini 3 Pro drone combo,DJI,Mini 3 Pro,,na,good,true,amazon,650.00,630.00,13,seed
+Logitech MX Master 3S Mouse,Logitech,MX Master 3S,,na,like_new,false,ebay,79.00,74.00,2,seed
+MX Master 3S wireless mouse,Logitech,MX Master 3S,,na,good,false,amazon,72.00,68.00,4,seed
+Apple Watch Series 9 41mm GPS,Apple,Watch Series 9,,wifi_only,like_new,true,ebay,299.00,285.00,6,seed
+Series 9 Apple Watch 41mm,Apple,Watch Series 9,,wifi_only,good,true,facebook,265.00,255.00,8,seed
+Steam Deck OLED 1TB,Valve,Steam Deck OLED,1024,wifi_only,like_new,true,ebay,579.00,565.00,5,seed
+Valve Steam Deck OLED 1TB,Valve,Steam Deck OLED,1024,wifi_only,good,true,facebook,545.00,530.00,9,seed
+GoPro HERO12 Black,GoPro,HERO12 Black,,na,like_new,true,ebay,299.00,289.00,4,seed
+GoPro Hero 12 black action camera,GoPro,HERO12 Black,,na,good,false,amazon,275.00,265.00,7,seed
+Bose QuietComfort Ultra Headphones,Bose,QC Ultra,,na,like_new,true,ebay,329.00,315.00,6,seed
+Bose QC Ultra headphones,Bose,QC Ultra,,na,good,true,facebook,305.00,295.00,8,seed
+Microsoft Xbox Series X 1TB,Microsoft,Xbox Series X,1024,na,like_new,true,ebay,399.00,385.00,7,seed
+Xbox Series X console 1TB,Microsoft,Xbox Series X,1024,na,good,true,amazon,375.00,360.00,10,seed
+Apple iPhone 14 128GB Unlocked,Apple,iPhone 14,128,unlocked,like_new,true,ebay,449.00,435.00,5,seed
+iPhone 14 128 unlocked black,Apple,iPhone 14,128,unlocked,good,true,facebook,420.00,405.00,8,seed
+Samsung Galaxy Buds2 Pro,Samsung,Galaxy Buds2 Pro,,na,like_new,true,ebay,89.00,82.00,3,seed
+Galaxy Buds 2 Pro,Samsung,Galaxy Buds2 Pro,,na,good,false,amazon,79.00,74.00,4,seed
+Raspberry Pi 5 8GB Board,Raspberry Pi,Pi 5,8,na,new,false,ebay,89.00,85.00,2,seed
+Raspberry Pi 5 8GB,Raspberry Pi,Pi 5,8,na,like_new,false,amazon,92.00,88.00,3,seed
+ASUS ROG Ally Z1 Extreme,ASUS,ROG Ally,,wifi_only,like_new,true,ebay,499.00,485.00,9,seed
+ASUS ROG Ally handheld,ASUS,ROG Ally,,wifi_only,good,true,facebook,460.00,445.00,11,seed
+Sony Alpha a7 IV Body,Sony,Alpha a7 IV,,na,like_new,false,ebay,2199.00,2150.00,15,seed
+Sony a7IV mirrorless body,Sony,Alpha a7 IV,,na,good,false,facebook,2050.00,1995.00,18,seed
+Apple TV 4K 128GB WiFi + Ethernet,Apple,Apple TV 4K,128,wifi_only,like_new,true,ebay,149.00,142.00,4,seed
+Apple TV 4K 128gb,Apple,Apple TV 4K,128,wifi_only,good,true,amazon,135.00,128.00,6,seed

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: price-wire
+    runtime: node
+    rootDir: apps/pricewire
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SERPAPI_KEY
+        sync: false
+      - key: TABPFN_API_KEY
+        sync: false
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false
+      - key: OLLAMA_BASE_URL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
