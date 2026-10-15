@@ -1,3 +1,4 @@
+import pg from "pg";
 import { config } from "../config.js";
 
 let ollamaReachable: boolean | null = null;
@@ -35,4 +36,22 @@ export function integrationFlags() {
     google_gemma: Boolean(config.googleApiKey),
     ollama_enabled: config.ollamaEnabled,
   };
+}
+
+/** True only when DATABASE_URL is set and a connection succeeds. */
+export async function isDatabaseLive(): Promise<boolean> {
+  if (!config.databaseUrl) return false;
+  const pool = new pg.Pool({
+    connectionString: config.databaseUrl,
+    max: 1,
+    connectionTimeoutMillis: 2500,
+  });
+  try {
+    await pool.query("SELECT 1");
+    return true;
+  } catch {
+    return false;
+  } finally {
+    await pool.end().catch(() => undefined);
+  }
 }

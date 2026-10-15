@@ -66,7 +66,9 @@ type Quote = {
 };
 
 type Health = {
-  database: boolean;
+  database_configured?: boolean;
+  database_live?: boolean;
+  database?: boolean;
   serpapi: boolean;
   tabpfn: boolean;
   gemma: boolean;
@@ -93,8 +95,15 @@ const conditionDetailInput = document.querySelector<HTMLTextAreaElement>(
   "#condition-detail",
 )!;
 const themeToggle = document.querySelector<HTMLButtonElement>("#theme-toggle")!;
+const celebrateLayer =
+  document.querySelector<HTMLElement>("#celebrate-layer")!;
 
 let conditionOptions: ConditionOption[] = [];
+let lastSubmitPointer: { x: number; y: number } | null = null;
+
+submitBtn.addEventListener("pointerdown", (e) => {
+  lastSubmitPointer = { x: e.clientX, y: e.clientY };
+});
 
 conditionOptions = Array.from(conditionSelect.options).map((o) => ({
   value: o.value,
@@ -106,7 +115,7 @@ updateConditionHint();
 void loadHealth();
 void loadConditions();
 initTheme();
-initDemoPriceCycle();
+initInteractiveDemoPanel();
 
 function initTheme() {
   const root = document.documentElement;
@@ -164,6 +173,7 @@ function updateConditionHint() {
   const match = conditionOptions.find((c) => c.value === conditionSelect.value);
   const parts = [match?.helper_text, match?.marketing_note].filter(Boolean);
   conditionHint.textContent = parts.join(" — ");
+  conditionHint.classList.remove("field-context-error");
   const showDetail = needsConditionDetail(conditionSelect.value);
   conditionDetailWrap.classList.toggle("hidden", !showDetail);
   conditionDetailInput.required = showDetail;
@@ -172,34 +182,238 @@ function updateConditionHint() {
   }
 }
 
-function initDemoPriceCycle() {
-  const prices = document.querySelectorAll<HTMLElement>(".demo-price");
-  prices.forEach((el, i) => {
-    const row = el.closest<HTMLElement>(".sample-row");
-    const base = Number(row?.dataset.price ?? el.textContent?.replace(/\D/g, ""));
-    if (!base) return;
-    let tick = 0;
-    window.setInterval(() => {
-      tick += 1;
-      const jitter = ((i + tick) % 5) - 2;
-      el.textContent = `$${base + jitter}`;
-    }, 2800 + i * 400);
+const CELEBRATE_PALETTE = [
+  "#d4a574",
+  "#e8c49a",
+  "#f5ebe0",
+  "#2d6b4f",
+  "#a66b2e",
+  "#fffdf8",
+  "#7dd3a8",
+];
+
+function spawnCelebrationParticles(
+  x: number,
+  y: number,
+  opts: { count: number; spread: number; soft?: boolean },
+) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const host = celebrateLayer ?? document.body;
+
+  for (let i = 0; i < opts.count; i++) {
+    const bit = document.createElement("span");
+    bit.className = "submit-confetti";
+    if (opts.soft) bit.classList.add("confetti-soft");
+    if (Math.random() > 0.38) bit.classList.add("is-spark");
+
+    const angle = Math.random() * Math.PI * 2;
+    const speed = opts.spread * (0.35 + Math.random() * 0.65);
+    const dx = Math.cos(angle) * speed;
+    const dy = Math.sin(angle) * speed - speed * 0.15;
+    const w = 3 + Math.random() * 8;
+    const h = 2 + Math.random() * 6;
+
+    bit.style.left = `${x}px`;
+    bit.style.top = `${y}px`;
+    bit.style.width = `${w}px`;
+    bit.style.height = `${h}px`;
+    bit.style.background =
+      CELEBRATE_PALETTE[Math.floor(Math.random() * CELEBRATE_PALETTE.length)] ??
+      CELEBRATE_PALETTE[0];
+    bit.style.setProperty("--dx", `${dx}px`);
+    bit.style.setProperty("--dy", `${dy}px`);
+    bit.style.setProperty(
+      "--spin",
+      `${Math.floor(Math.random() * 540 - 270)}deg`,
+    );
+    bit.style.animationDelay = `${Math.random() * 0.28}s`;
+
+    host.appendChild(bit);
+    bit.addEventListener("animationend", () => bit.remove(), { once: true });
+  }
+}
+
+function showCopyPop(x: number, y: number) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const host = celebrateLayer ?? document.body;
+  const pop = document.createElement("span");
+  pop.className = "copy-pop";
+  pop.innerHTML =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+  pop.style.left = `${x}px`;
+  pop.style.top = `${y}px`;
+  host.appendChild(pop);
+  pop.addEventListener("animationend", () => pop.remove(), { once: true });
+}
+
+function pointerFromEvent(
+  ev: Event,
+  fallbackEl: HTMLElement,
+): { x: number; y: number } {
+  const e = ev as MouseEvent;
+  if (typeof e.clientX === "number" && typeof e.clientY === "number") {
+    return { x: e.clientX, y: e.clientY };
+  }
+  const rect = fallbackEl.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+
+async function copyWithCelebrate(
+  text: string,
+  anchor: HTMLElement,
+  ev: Event,
+) {
+  await navigator.clipboard.writeText(text);
+  const { x, y } = pointerFromEvent(ev, anchor);
+  spawnCelebrationParticles(x, y, { count: 32, spread: 48, soft: true });
+  showCopyPop(x, y);
+}
+
+function runSubmitCelebrate(btn: HTMLButtonElement) {
+  const rect = btn.getBoundingClientRect();
+  const cx = lastSubmitPointer?.x ?? rect.left + rect.width / 2;
+  const cy = lastSubmitPointer?.y ?? rect.top + rect.height / 2;
+  spawnCelebrationParticles(cx, cy, { count: 72, spread: 62 });
+  lastSubmitPointer = null;
+}
+
+function serviceChip(
+  name: string,
+  state: "on" | "off" | "warn",
+  detail: string,
+): string {
+  return `<span class="svc-chip svc-${state}" title="${escapeAttr(detail)}"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">${escapeHtml(name)}</span><span class="visually-hidden">${escapeHtml(detail)}</span></span>`;
+}
+
+function initInteractiveDemoPanel() {
+  const panel = document.querySelector<HTMLElement>("#sample-panel");
+  if (!panel) return;
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll<HTMLElement>(".demo-price").forEach((priceEl) => {
+    wrapPriceDigits(priceEl);
+    const base = Number(priceEl.dataset.base ?? "0");
+    priceEl.addEventListener("mouseenter", () => {
+      if (!reduced) flipPriceDigits(priceEl, base);
+    });
+    priceEl.querySelectorAll<HTMLElement>(".price-digit").forEach((digit) => {
+      digit.addEventListener("mouseenter", () => {
+        digit.classList.add("lift");
+      });
+      digit.addEventListener("mouseleave", () => {
+        digit.classList.remove("lift");
+      });
+    });
   });
+
+  if (!reduced) {
+    window.setInterval(() => {
+      const prices = [...document.querySelectorAll<HTMLElement>(".demo-price")];
+      const pick = prices[Math.floor(Math.random() * prices.length)];
+      if (!pick) return;
+      const base = Number(pick.dataset.base ?? "0");
+      const delta = Math.floor(Math.random() * 7) - 3;
+      setPriceValue(pick, Math.max(50, base + delta), true);
+    }, 4200);
+
+    panel.addEventListener("mousemove", (e) => {
+      const rect = panel.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      panel.style.transform = `rotateX(${-y * 7}deg) rotateY(${x * 9}deg)`;
+    });
+
+    panel.addEventListener("mouseleave", () => {
+      panel.style.transform = "rotateX(0deg) rotateY(0deg)";
+    });
+  }
+}
+
+function wrapPriceDigits(priceEl: HTMLElement) {
+  const digits = priceEl.querySelector<HTMLElement>(".price-digits");
+  if (!digits) return;
+  const text = digits.textContent ?? "";
+  digits.innerHTML = text
+    .split("")
+    .map((ch) => `<span class="price-digit">${escapeHtml(ch)}</span>`)
+    .join("");
+}
+
+function setPriceValue(priceEl: HTMLElement, value: number, animate: boolean) {
+  const digits = priceEl.querySelector<HTMLElement>(".price-digits");
+  if (!digits) return;
+  const str = String(value);
+  if (animate) {
+    digits.querySelectorAll<HTMLElement>(".price-digit").forEach((d) => {
+      d.classList.add("flip");
+      window.setTimeout(() => d.classList.remove("flip"), 360);
+    });
+    window.setTimeout(() => {
+      digits.innerHTML = str
+        .split("")
+        .map((ch) => `<span class="price-digit">${escapeHtml(ch)}</span>`)
+        .join("");
+      bindDigitLift(priceEl);
+    }, 180);
+  } else {
+    digits.textContent = str;
+    wrapPriceDigits(priceEl);
+    bindDigitLift(priceEl);
+  }
+}
+
+function bindDigitLift(priceEl: HTMLElement) {
+  priceEl.querySelectorAll<HTMLElement>(".price-digit").forEach((digit) => {
+    digit.addEventListener("mouseenter", () => digit.classList.add("lift"));
+    digit.addEventListener("mouseleave", () => digit.classList.remove("lift"));
+  });
+}
+
+function flipPriceDigits(priceEl: HTMLElement, base: number) {
+  const delta = Math.floor(Math.random() * 11) - 5;
+  setPriceValue(priceEl, Math.max(50, base + delta), true);
+  window.setTimeout(() => setPriceValue(priceEl, base, true), 900);
 }
 
 async function loadHealth() {
   try {
     const res = await fetch("/api/health?verbose=1");
     const h = (await res.json()) as Health;
-    const parts = [
-      h.gemma ? '<span class="on">Gemma</span>' : "Gemma off",
-      h.tabpfn ? '<span class="on">TabPFN</span>' : "TabPFN off",
-      h.database ? '<span class="on">Tiger</span>' : "sample sales",
-      h.serpapi ? '<span class="on">SerpApi</span>' : "SerpApi off",
-    ];
-    statusLine.innerHTML = `Data: ${parts.join(" · ")}`;
+    const dbConfigured =
+      h.database_configured ?? h.database ?? false;
+    const tigerState = dbConfigured
+      ? h.database_live
+        ? "on"
+        : "warn"
+      : "warn";
+    const tigerDetail = dbConfigured
+      ? h.database_live
+        ? "Tiger database connected"
+        : "DATABASE_URL set but not reachable"
+      : "Sample CSV comps (tier 0)";
+
+    statusLine.innerHTML = [
+      serviceChip(
+        "Gemma",
+        h.gemma ? "on" : "off",
+        h.gemma ? "Gemma / Ollama available" : "Gemma off",
+      ),
+      serviceChip(
+        "TabPFN",
+        h.tabpfn ? "on" : "off",
+        h.tabpfn ? "TabPFN pricing API" : "TabPFN off",
+      ),
+      serviceChip("Tiger", tigerState, tigerDetail),
+      serviceChip(
+        "SerpApi",
+        h.serpapi ? "on" : "off",
+        h.serpapi ? "SerpApi comps" : "SerpApi off",
+      ),
+    ].join("");
   } catch {
-    statusLine.textContent = "API offline — start the server with npm run dev";
+    statusLine.innerHTML =
+      '<span class="svc-status-offline">API offline — start the server with npm run dev</span>';
   }
 }
 
@@ -214,11 +428,19 @@ form.addEventListener("submit", async (e) => {
     : "";
 
   if (needsConditionDetail(condition) && !condition_detail) {
-    conditionDetailInput.focus();
     conditionDetailWrap.classList.remove("hidden");
+    conditionDetailInput.focus();
+    conditionDetailInput.setAttribute("aria-invalid", "true");
+    conditionHint.textContent =
+      "Add condition details before continuing—buyers need to know about wear, defects, and what is included.";
+    conditionHint.classList.add("field-context-error");
     return;
   }
+  conditionDetailInput.removeAttribute("aria-invalid");
+  conditionHint.classList.remove("field-context-error");
 
+  const scrollY = window.scrollY;
+  runSubmitCelebrate(submitBtn);
   submitBtn.disabled = true;
   results.classList.remove("hidden");
   results.innerHTML = `
@@ -227,6 +449,7 @@ form.addEventListener("submit", async (e) => {
       <span>Matching similar sales and drafting your listing…</span>
     </div>
   `;
+  window.scrollTo(0, scrollY);
 
   try {
     const res = await fetch("/api/quote", {
@@ -307,10 +530,10 @@ function renderQuote(q: Quote) {
 
   function wireCopyButtons(root: ParentNode) {
     root.querySelectorAll<HTMLButtonElement>("[data-copy-target]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
+      btn.addEventListener("click", async (ev) => {
         const id = btn.getAttribute("data-copy-target");
         const el = id ? document.getElementById(id) : null;
-        if (el) await navigator.clipboard.writeText(el.textContent ?? "");
+        if (el) await copyWithCelebrate(el.textContent ?? "", btn, ev);
       });
     });
   }
@@ -334,8 +557,9 @@ function renderQuote(q: Quote) {
     `;
 
     wireCopyButtons(host);
-    host.querySelector("#copy-essentials-btn")?.addEventListener("click", async () => {
-      await navigator.clipboard.writeText(packet.copy_essentials_text);
+    host.querySelector("#copy-essentials-btn")?.addEventListener("click", async (ev) => {
+      const btn = ev.currentTarget as HTMLButtonElement;
+      await copyWithCelebrate(packet.copy_essentials_text, btn, ev);
     });
   }
 
@@ -353,7 +577,9 @@ function renderQuote(q: Quote) {
               <div class="draft-field">
                 <label for="${fieldId}">${escapeHtml(f.label)}${lenNote ? `<span class="char-note">${escapeHtml(lenNote)}</span>` : ""}</label>
                 ${f.hint ? `<p class="field-hint">${escapeHtml(f.hint)}</p>` : ""}
-                <div class="draft-box${f.multiline ? " multiline" : ""}" id="${fieldId}">${escapeHtml(f.value)}</div>
+                <div class="draft-box-wrap${f.multiline ? " scrollable" : ""}">
+                  <div class="draft-box${f.multiline ? " multiline" : ""}" id="${fieldId}">${escapeHtml(f.value)}</div>
+                </div>
                 <div class="copy-row">
                   <button type="button" class="ghost" data-copy-target="${fieldId}">Copy ${escapeHtml(f.label)}</button>
                 </div>
@@ -387,8 +613,9 @@ function renderQuote(q: Quote) {
     });
   });
 
-  document.querySelector("#copy-brief")?.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(q.listing_brief);
+  document.querySelector("#copy-brief")?.addEventListener("click", async (ev) => {
+    const btn = ev.currentTarget as HTMLButtonElement;
+    await copyWithCelebrate(q.listing_brief, btn, ev);
   });
 }
 

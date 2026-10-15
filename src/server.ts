@@ -9,6 +9,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { config } from "./config.js";
 import {
   integrationFlags,
+  isDatabaseLive,
   isGemmaConfigured,
 } from "./lib/integration-health.js";
 import { checkRateLimit } from "./lib/rate-limit.js";
@@ -125,10 +126,12 @@ app.get("/api/health", async (c) => {
   }
   const flags = integrationFlags();
   const gemma = await isGemmaConfigured();
+  const database_live = flags.database ? await isDatabaseLive() : false;
   return c.json({
     ok: true,
     service: "price-wire",
-    database: flags.database,
+    database_configured: flags.database,
+    database_live,
     serpapi: flags.serpapi,
     tabpfn: flags.tabpfn,
     gemma,

@@ -86,7 +86,6 @@ export const ListingDraftSchema = z.object({
     width_in: z.number(),
     height_in: z.number(),
     weight_lb: z.number(),
-    package_note: z.string(),
   }),
   condition_label: z.string(),
   condition_marketing_tip: z.string(),
