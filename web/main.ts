@@ -1,3 +1,36 @@
+type ListingFormField = {
+  id: string;
+  label: string;
+  value: string;
+  hint?: string;
+  max_length?: number;
+  multiline?: boolean;
+};
+
+type ListingFormSection = {
+  id: string;
+  title: string;
+  description?: string;
+  fields: ListingFormField[];
+};
+
+type PlatformId = "ebay" | "etsy" | "stockx" | "facebook";
+
+type PlatformListingPacket = {
+  platform: PlatformId;
+  label: string;
+  tagline: string;
+  sections: ListingFormSection[];
+  copy_all_text: string;
+};
+
+type ListingSetup = {
+  default_platform: PlatformId;
+  platforms: Array<{ id: PlatformId; label: string; tagline: string }>;
+  shared_sections: ListingFormSection[];
+  packets: Record<PlatformId, PlatformListingPacket>;
+};
+
 type ListingDraft = {
   title: string;
   description: string;
@@ -23,6 +56,7 @@ type Quote = {
   method_label: string;
   listing_brief: string;
   listing_draft: ListingDraft;
+  listing_setup: ListingSetup;
   comps: Array<{
     title: string;
     platform: string;
@@ -193,17 +227,15 @@ function renderQuote(q: Quote) {
     )
     .join("");
 
-  const specsRows = Object.entries(q.listing_draft.item_specifics)
-    .map(
-      ([k, v]) =>
-        `<div class="spec-row"><span>${escapeHtml(k)}</span><span>${escapeHtml(v)}</span></div>`,
-    )
-    .join("");
-
-  const ship = q.listing_draft.shipping;
+  const setup = q.listing_setup;
+  const activePlatform = setup?.default_platform ?? "ebay";
+  const platformTabs = (setup?.platforms ?? []).map(
+    (p) =>
+      `<button type="button" class="platform-tab${p.id === activePlatform ? " active" : ""}" data-platform="${p.id}" aria-pressed="${p.id === activePlatform}">${escapeHtml(p.label)}</button>`,
+  ).join("");
 
   results.innerHTML = `
-    <h2 class="results-title">Price &amp; listing draft</h2>
+    <h2 class="results-title">Price &amp; listing setup</h2>
     <div class="price-grid">
       <div class="stat featured"><span>Suggested price</span><strong>$${q.suggested_price}</strong></div>
       <div class="stat"><span>Quick sale</span><strong>$${q.quick_sale_price}</strong></div>
@@ -218,30 +250,12 @@ function renderQuote(q: Quote) {
       </table>
     </div>
 
-    <div class="draft-block">
-      <h3>Listing starter</h3>
+    <div class="draft-block listing-setup">
+      <h3>Paste into marketplace forms</h3>
       <p class="field-hint">${escapeHtml(q.listing_draft.condition_marketing_tip)}</p>
-      <div class="draft-field">
-        <label for="draft-title">Title</label>
-        <div class="draft-box" id="draft-title">${escapeHtml(q.listing_draft.title)}</div>
-        <div class="copy-row"><button type="button" class="ghost" data-copy="draft-title">Copy title</button></div>
-      </div>
-      <div class="draft-field">
-        <label for="draft-desc">Description</label>
-        <div class="draft-box" id="draft-desc">${escapeHtml(q.listing_draft.description)}</div>
-        <div class="copy-row"><button type="button" class="ghost" data-copy="draft-desc">Copy description</button></div>
-      </div>
-      <div class="draft-field">
-        <label>Item specifics</label>
-        <div class="specs-grid">${specsRows}</div>
-      </div>
-      <div class="draft-field">
-        <label>Shipping estimate (verify before labels)</label>
-        <div class="draft-box">
-          ${ship.length_in} × ${ship.width_in} × ${ship.height_in} in · ~${ship.weight_lb} lb packed
-        </div>
-        <p class="shipping-callout"><span class="warn">Verify:</span> ${escapeHtml(ship.package_note)}</p>
-      </div>
+      <p class="setup-lede">One item entry — shared pricing and shipping, plus fields tuned for each marketplace.</p>
+      <div class="platform-tabs" role="tablist" aria-label="Marketplace">${platformTabs}</div>
+      <div id="platform-packet" class="platform-packet"></div>
     </div>
 
     <div class="brief" id="brief">${escapeHtml(q.listing_brief)}</div>
@@ -250,16 +264,98 @@ function renderQuote(q: Quote) {
     </div>
   `;
 
-  document.querySelector("#copy-brief")?.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(q.listing_brief);
+  let currentPlatform = activePlatform;
+
+  function renderPlatformPacket(platformId: PlatformId) {
+    const packet = setup.packets[platformId];
+    const host = document.querySelector<HTMLElement>("#platform-packet");
+    if (!packet || !host) return;
+
+    const onlyPlatformSections = packet.sections.filter(
+      (s) => !setup.shared_sections.some((sh) => sh.id === s.id),
+    );
+
+    const sharedHtml = renderSections(setup.shared_sections, "shared");
+    const platformHtml = renderSections(onlyPlatformSections, platformId);
+
+    host.innerHTML = `
+      <p class="platform-tagline">${escapeHtml(packet.tagline)}</p>
+      <div class="section-group">
+        <h4 class="section-group-title">Same on every platform</h4>
+        ${sharedHtml}
+      </div>
+      <div class="section-group">
+        <h4 class="section-group-title">${escapeHtml(packet.label)}-specific</h4>
+        ${platformHtml}
+      </div>
+      <div class="copy-row">
+        <button type="button" class="ghost primary-copy" id="copy-platform-all">Copy all for ${escapeHtml(packet.label)}</button>
+      </div>
+    `;
+
+    host.querySelector("#copy-platform-all")?.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(packet.copy_all_text);
+    });
+
+    host.querySelectorAll<HTMLButtonElement>("[data-copy-target]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-copy-target");
+        const el = id ? document.getElementById(id) : null;
+        if (el) await navigator.clipboard.writeText(el.textContent ?? "");
+      });
+    });
+  }
+
+  function renderSections(sections: ListingFormSection[], idPrefix: string): string {
+    return sections
+      .map((section) => {
+        const fields = section.fields
+          .map((f, i) => {
+            const fieldId = `${idPrefix}-${section.id}-${f.id}-${i}`;
+            const lenNote =
+              f.max_length && f.value.length > 0
+                ? ` · ${f.value.length}/${f.max_length} chars`
+                : "";
+            return `
+              <div class="draft-field">
+                <label for="${fieldId}">${escapeHtml(f.label)}${lenNote ? `<span class="char-note">${escapeHtml(lenNote)}</span>` : ""}</label>
+                ${f.hint ? `<p class="field-hint">${escapeHtml(f.hint)}</p>` : ""}
+                <div class="draft-box${f.multiline ? " multiline" : ""}" id="${fieldId}">${escapeHtml(f.value)}</div>
+                <div class="copy-row">
+                  <button type="button" class="ghost" data-copy-target="${fieldId}">Copy ${escapeHtml(f.label)}</button>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+        return `
+          <section class="form-section">
+            <h5>${escapeHtml(section.title)}</h5>
+            ${section.description ? `<p class="section-desc">${escapeHtml(section.description)}</p>` : ""}
+            ${fields}
+          </section>
+        `;
+      })
+      .join("");
+  }
+
+  renderPlatformPacket(currentPlatform);
+
+  results.querySelectorAll<HTMLButtonElement>(".platform-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const id = tab.getAttribute("data-platform") as PlatformId;
+      currentPlatform = id;
+      results.querySelectorAll(".platform-tab").forEach((t) => {
+        const on = t.getAttribute("data-platform") === id;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      renderPlatformPacket(id);
+    });
   });
 
-  results.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.getAttribute("data-copy");
-      const el = id ? document.getElementById(id) : null;
-      if (el) await navigator.clipboard.writeText(el.textContent ?? "");
-    });
+  document.querySelector("#copy-brief")?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(q.listing_brief);
   });
 }
 

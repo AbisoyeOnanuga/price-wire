@@ -24,7 +24,7 @@ Part-time sellers on eBay, Facebook Marketplace, Amazon, and similar platforms w
 ## Quick start
 
 ```bash
-cd apps/pricewire
+cd price-wire
 cp .env.example .env
 npm install
 npm run seed    # loads sample CSV; uses Tiger when DATABASE_URL is set
@@ -33,6 +33,8 @@ npm run dev
 ```
 
 Open `http://localhost:8787` and try: `Sony WH-1000XM5 Wireless Headphones Black`.
+
+After pricing, use **Paste into marketplace forms** to copy eBay-, Etsy-, StockX-, or Facebook-shaped fields (shared pricing/shipping plus platform-specific sections).
 
 Smoke test without the server:
 

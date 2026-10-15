@@ -503,6 +503,90 @@ tr:last-child td {
   border-radius: 0 10px 10px 0;
 }
 
+.listing-setup .setup-lede {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.platform-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.platform-tab {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.platform-tab.active {
+  border-color: var(--copper);
+  background: var(--surface-alt);
+}
+
+.platform-tagline {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.section-group {
+  margin-bottom: 1.25rem;
+}
+
+.section-group-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--copper-dim);
+  font-weight: 600;
+}
+
+.form-section h5 {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 1rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.section-desc {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.field-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.char-note {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+  margin-left: 0.35rem;
+}
+
+.draft-box.multiline {
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.ghost.primary-copy {
+  border-color: var(--copper-dim);
+}
+
 .copy-row {
   margin-top: 0.85rem;
   display: flex;

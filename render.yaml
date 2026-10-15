@@ -2,7 +2,7 @@ services:
   - type: web
     name: price-wire
     runtime: node
-    rootDir: apps/pricewire
+    rootDir: .
     buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
