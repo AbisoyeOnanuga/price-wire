@@ -7,7 +7,9 @@
    - `DATABASE_URL` — Tiger Data Postgres connection string (enable pgvector; run `npm run seed` once via shell or CI).
    - `GOOGLE_GENERATIVE_AI_API_KEY` or `OLLAMA_BASE_URL` — Gemma extraction.
    - `TABPFN_API_KEY` — Prior Labs TabPFN predictions.
-   - `SERPAPI_KEY` — live eBay comps.
+   - `SERPAPI_KEY` — live shopping + eBay comps (2 SerpApi calls per quote).
+   - `QUOTE_RATE_LIMIT` — default `8` on Render (per IP per minute).
+   - `QUOTE_DAILY_CAP` — default `30` global quotes per UTC day (protects Serp quota); see `hacktoberfest-week2/USAGE-LIMITS.md`.
    - `SENTRY_DSN` — optional agent tracing for the Hacktoberfest post.
 
 Build runs `npm install && npm run build`; start runs `npm run start` on port `8787` (set `PORT` if Render assigns another).

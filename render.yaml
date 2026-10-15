@@ -20,3 +20,7 @@ services:
         sync: false
       - key: SENTRY_DSN
         sync: false
+      - key: QUOTE_RATE_LIMIT
+        value: "8"
+      - key: QUOTE_DAILY_CAP
+        value: "30"

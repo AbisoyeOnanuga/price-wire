@@ -161,6 +161,20 @@ app.post("/api/quote", async (c) => {
     );
   }
 
+  if (config.quoteDailyCap > 0) {
+    const dayKey = `quote:global:${new Date().toISOString().slice(0, 10)}`;
+    const daily = checkRateLimit(dayKey, config.quoteDailyCap, 86_400_000);
+    if (!daily.allowed) {
+      return c.json(
+        {
+          error:
+            "today's shared demo quota is full; try again tomorrow or run locally (see repo SETUP.md)",
+        },
+        503,
+      );
+    }
+  }
+
   const body = await c.req.json<{
     title?: string;
     condition?: string;

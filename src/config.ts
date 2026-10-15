@@ -32,6 +32,8 @@ export const config = {
   allowedOrigins: parseOrigins(env("ALLOWED_ORIGINS")),
   quoteApiKey: env("QUOTE_API_KEY"),
   quoteRateLimit: Number(env("QUOTE_RATE_LIMIT", "30")),
+  /** Global cap on /api/quote per UTC day (0 = unlimited). Protects SerpApi quota on public demos. */
+  quoteDailyCap: Number(env("QUOTE_DAILY_CAP", "0")),
   serpMinLocalComps: Number(env("SERP_MIN_LOCAL_COMPS", "4")),
   /**
    * Set true for Tiger/managed Postgres when Node reports SELF_SIGNED_CERT_IN_CHAIN.
