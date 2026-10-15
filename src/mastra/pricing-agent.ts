@@ -92,10 +92,12 @@ export async function runPricingPipeline(
   const specs = await extractSpecs(title, marketplace.pricing_grade);
 
   const tigerComps = await searchComps(specs, 12);
-  const needSerp = tigerComps.length < config.serpMinLocalComps;
-  const serp = needSerp ? await fetchSerpComps(specs, 6) : [];
-  if (serp.length) {
-    await upsertSerpComps(serp);
+  let serp: Awaited<ReturnType<typeof fetchSerpComps>> = [];
+  if (config.serpApiKey) {
+    serp = await fetchSerpComps(specs, 6);
+    if (serp.length) {
+      await upsertSerpComps(serp);
+    }
   }
 
   const seen = new Set<string>();

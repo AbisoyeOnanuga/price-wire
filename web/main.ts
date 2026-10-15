@@ -491,7 +491,7 @@ function renderQuote(q: Quote) {
       <div class="stat"><span>Hold firm</span><strong class="price-animate" style="animation-delay:0.16s">$${q.hold_price}</strong></div>
       <div class="stat"><span>Match quality</span><strong>${escapeHtml(q.confidence_label)}</strong></div>
     </div>
-    <p class="meta-row">${q.comp_count} similar sale${q.comp_count === 1 ? "" : "s"} · ${escapeHtml(q.method_label)}</p>
+    <p class="meta-row">${formatCompMeta(q)}</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Similar sale</th><th>Platform</th><th>Sold for</th><th>Data</th></tr></thead>
@@ -616,6 +616,20 @@ function renderQuote(q: Quote) {
     const btn = ev.currentTarget as HTMLButtonElement;
     await copyWithCelebrate(q.listing_brief, btn, ev);
   });
+}
+
+function formatCompMeta(q: Quote): string {
+  const web = q.comps.filter((c) => c.source === "serpapi").length;
+  const bundled = q.comps.filter(
+    (c) => c.source === "seed" || c.source === "tiger",
+  ).length;
+  const parts = [
+    `${q.comp_count} similar sale${q.comp_count === 1 ? "" : "s"}`,
+    web > 0 ? `${web} from web search` : null,
+    bundled > 0 && web > 0 ? `${bundled} from library` : null,
+    escapeHtml(q.method_label),
+  ].filter(Boolean);
+  return parts.join(" · ");
 }
 
 function escapeHtml(s: string): string {

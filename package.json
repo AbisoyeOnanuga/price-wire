@@ -8,6 +8,7 @@
     "dev": "npm run build:web && tsx watch src/server.ts",
     "build": "npm run build:web && tsc -p tsconfig.server.json",
     "start": "node dist/server.js",
+    "db:schema": "tsx scripts/apply-schema.ts",
     "seed": "tsx scripts/seed-comps.ts",
     "smoke": "tsx scripts/smoke-test.ts"
   },

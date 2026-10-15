@@ -84,20 +84,18 @@ Restart dev server. Cloud Gemma is used when the key is set (see `extract-specs.
 ### Tier 2 — Tiger / Postgres
 
 1. Create a **DEV** Postgres service with **pgvector** enabled (Tiger MCP or Tiger console).
-2. Apply schema:
+2. Set `DATABASE_URL` in `.env` (Tiger or any Postgres with pgvector).
+
+3. Apply schema and seed (**do not** run `sql/schema.sql` in PowerShell or bash — that file is SQL, not a shell script):
 
 ```bash
-# Using psql or Tiger SQL console — run sql/schema.sql
-```
-
-3. Set `DATABASE_URL` in `.env`.
-4. Seed sample electronics comps:
-
-```bash
+npm run db:schema
 npm run seed
 ```
 
-The form status chip **Sale prices** shows **online** when the DB answers; otherwise **offline — sample sales**. URL alone is not enough—you must run `sql/schema.sql` and `npm run seed`.
+Or paste `sql/schema.sql` into the Tiger SQL console, then run `npm run seed` only.
+
+The form status chip **Sale prices** shows **online** when the DB answers; otherwise **offline — sample sales**. URL alone is not enough—run `npm run db:schema` then `npm run seed`.
 
 ### Tier 3 — SerpApi
 
@@ -105,7 +103,7 @@ The form status chip **Sale prices** shows **online** when the DB answers; other
 SERPAPI_KEY=your_key
 ```
 
-Restart server. Live snippets are fetched on quote, deduped, and optionally upserted when Tiger is configured.
+Restart server. With a key set, **every quote** calls SerpApi (up to 6 eBay rows), merges into the table, and shows `serpapi` in the **Data** column. Results line includes “N from web search” when rows return.
 
 ### Tier 4 — TabPFN
 
