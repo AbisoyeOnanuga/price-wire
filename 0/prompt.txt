@@ -1,0 +1,526 @@
+<external_links>
+### Potentially Relevant Websearch Results
+
+You should respond as if these information are known to you. Refrain from saying "I am unable to browse the internet" or "I don't have access to the internet" or "I'm unable to provide real-time news updates". This is your internet search results. Please always cite any links you referenced from the above search results in your response in markdown format.
+
+-------
+Website URL: https://dev.to/challenges/hacktoberfest-week2-2026-10-12
+Website Title: Hacktoberfest Open-Source AI Challenge: Week 2 - DEV Challenge - DEV CommunityNavigation menuSearchSearchClose
+Website Content:
+Skip to content 
+
+Navigation menu DEV Community 
+
+Search  Powered by AlgoliaSearch 
+
+ Log in  Create account 
+
+## DEV Community
+
+Close 
+
+ Challenges →  Hacktoberfest Open-Source AI Challenge: Week 2 
+
+Hacktoberfest Open-Source AI Challenge: Week 2 Hacktoberfest Open-Source AI Challenge: Week 2 
+
+#  Hacktoberfest Open-Source AI Challenge: Week 2
+
+ Signed Up  Sign Up Sign Up  View Entries 
+
+ Please sign in to follow this challenge 
+
+Challenge 3 of 5 in our Hacktoberfest DEV Challenges. One prompt, a new theme every week.
+
+Challenge Status: Live Ended 
+
+**This year's Hacktoberfest is not about open source pull requests.** There's no PR count to hit and no repos to hunt for. Instead, you build a brand-new project with open-source AI at its core, and write about it on DEV. Here's everything you need to know about Hacktoberfest 2026.
+
+Week 2 of our **five Hacktoberfest DEV Challenges** starts today! Running through **October 18**, the **Hacktoberfest Open-Source AI Challenge: Week 2** gives you a full week to build.
+
+Missed Week 1: Touch Grass? No problem. Every challenge is a fresh start, so you're competing on the same footing as everyone else.
+
+This week, we'll select **one overall winner** and a winner in each of our **17 partner categories**. See all five challenges and current partner categories on the HF26 DEV Challenge Hub.
+
+Free partner credits
+
+Several partners are giving participants credits and promo codes, including Tinker, Render, Backboard, and a free .tech domain. Claim yours at hacktoberfest.com/my/promos.
+
+Claim your credits →Visit hacktoberfest.com
+
+## Key Dates
+
+* Contest start:  October 12, 2026
+* Submissions due: October 18, 2026
+* Winners announced: Week of October 19
+
+## Badge Rewards
+
+ Hacktoberfest Challenge Completion Badge
+
+ Hacktoberfest Challenge Winner Badge
+
+## Find Out More
+
+Ask questions and share your ideas on the Hacktoberfest Open-Source AI Challenge: Week 2 Launch Post.
+
+ View Launch Post 
+
+##  Challenge Prompt
+
+###  Side Hustle
+
+**Build something with open-source AI at its core.**
+
+That can mean running an open-weight model, building on an open-source agent harness or framework, running inference locally, or all three. Whatever you pick, the open pieces should be what makes your project work.
+
+In your post, tell us **why open innovation matters for what you built**. Does it run on a laptop with no internet? Keep someone's data off a server they don't control? Let you fine-tune, swap models, or change how your agent behaves? Cost nothing to run? Tell us where your open-based approach worked better than a closed one.
+
+#### This Week's Theme: Side Hustle
+
+**Build something with open-weight models or open-source AI that someone would actually pay for.**
+
+That can mean running an open-weight model, building on an open-source agent harness or framework, running inference locally, or all three. Whatever you pick, the open pieces should be what makes your project work.
+
+Think small, specific, and useful. The best builds here solve a real problem for a real person, whether that's a freelancer, a small business owner, a niche hobby community, or your friend who keeps complaining about the same tedious task. A few ideas to get you going:
+
+* An invoice and receipt sorter for freelancers that runs locally, so client data never leaves their laptop
+* A listing writer for Etsy or eBay sellers that turns a few product photos into a polished description
+* A menu translator for a local restaurant that handles their specific dishes better than a generic tool
+
+In your post, tell us **why open innovation matters for what you built**. Does running your own model keep costs low enough that the business actually works? Keep your customers' data private? Let you fine-tune for a niche that a general-purpose API handles poorly? Avoid getting locked into someone else's pricing? Tell us where your open-based approach worked better than a closed one.
+
+**Bonus points if you land your first user.** Get it in front of someone, let them use it, and tell us how it went. Did they pay? Would they? What did they ask for next?
+
+ Submission Template 
+
+**Show your work.** We'd love to see how you built it. Save your agent session with DevRelay and embed it in your post, or link to it. It's optional, but it helps the judges understand your process.
+
+#### Judging Criteria
+
+* Writing Quality (weighted most heavily)
+* Relevance to the Prompt and Theme
+* Creativity
+* Technical Execution
+* Use of Partner Technology (optional)
+
+#### Prizes
+
+$250 USD
+
+ \+ DEV++ Membership  
+\+ Exclusive winner badge
+
+##  Prize Categories
+
+### Featured categories
+
+$200 for each winner
+
+### Best Use of Render
+
+Use Render as your project's AI runtime, to host an agent's front end, or to run Hermes or OpenClaw.
+
+#### Prizes
+
+$200 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of TabPFN
+
+Use TabPFN, Prior Labs' tabular foundation model, to forecast, predict, classify, or spot anomalies from historical data like a CSV. Prior Labs strongly recommends the latest version, TabPFN-3.5: sign up at platform.priorlabs.ai and accept the free non-commercial license to get your API key. Prior Labs favors projects that use TabPFN inside a wider prediction agent (with or without the MCP server).
+
+#### Prizes
+
+$200 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Tinker
+
+Use Thinking Machines' Tinker to fine-tune a model for a specific task, and show a clear improvement in performance, latency, or cost over a baseline.
+
+#### Prizes
+
+$200 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Arduino
+
+Build with an Arduino UNO Q: run a model on the board, build a physical agent that senses and acts, or optimize a model for it with Qualcomm AI Hub. Open to anyone building with an UNO Q, whether you got one at an in-person Fest or have your own.
+
+#### Prizes
+
+$200 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of DigitalOcean
+
+Build or deploy your project on DigitalOcean: host your app or agent, run an open-weight model on a GPU Droplet (1-Click Models make this quick), or build an agent on the Gradient AI Platform.
+
+#### Prizes
+
+$200 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Gemma
+
+Use Gemma, Google's open-weight model, in building your project: run it locally, fine-tune it, or serve it through Google Cloud or another provider.
+
+#### Prizes
+
+$200 USD
+
+ \+ Exclusive winner badge
+
+### Partner categories
+
+$100 for each winner
+
+### Best Use of Backboard
+
+Build with R-CLI, Backboard's open-source terminal coding agent, compare open-weight models through a single Backboard API key, or give an open-source project's assistant memory and RAG.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of ElevenLabs
+
+Give an open-source agent a voice, transcribe audio for a local model, or generate narration for your demo.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Entire
+
+Share the agent sessions behind your project in the write-up, or search past agent work to explain why code exists.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of GitHub Copilot
+
+Build with Copilot's coding agent, the Copilot CLI, or the new Copilot app, automate your project with GitHub Actions, or review contributors' PRs with Copilot.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Mastra
+
+Orchestrate an agent over open models, add memory and tools to a chat agent, or build a workflow that triages GitHub issues.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of MongoDB Atlas
+
+Use Atlas as your data layer: Atlas Vector Search for retrieval, long-term memory for an agent, or the database behind an app built on an open-weight model.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Sentry Agent Tracing
+
+Show your agent's work: how it's set up, how it performs (latency, tokens, cost), what you found, and how you debugged it. Include traces or screenshots in your write-up.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of SerpApi
+
+Give an agent live web search, ground a RAG app in fresh results, or track news for an open-source project.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of a .tech Domain
+
+Put your project live on a .tech domain you claimed through Hacktoberfest, and link to it in your write-up. Claim a free first-year .tech domain at hacktoberfest.com/my/promos (it renews at $29.99 a year).
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Temporal
+
+Make your agent durable. Wrap it in a Temporal workflow so it survives failures, retries flaky tool calls, and picks up where it left off.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+### Best Use of Tiger Data
+
+Store embeddings with pgvector, run hybrid keyword and vector search for an agent, or let an agent manage a database through Tiger MCP.
+
+#### Prizes
+
+$100 USD
+
+ \+ Exclusive winner badge
+
+##  How To Participate
+
+Publish a post on DEV using the submission template above. Tell us what you built and who would pay for it, show us a demo, and explain why open innovation matters for what you built. If you landed your first user, tell us about it! The template adds the required tags: #devchallenge and #hf26challenge.
+
+##  Helpful Links & Resources
+
+**Need help?** Come hang out and ask questions in the MLH Discord, and read Everything You Need To Know About Hacktoberfest 2026.
+
+**Partner credits:** Several partners are giving participants credits and promo codes, including Tinker, Render, Backboard, and a free .tech domain. Claim yours at hacktoberfest.com/my/promos.
+
+**Partner docs:**
+
+* Render
+* TabPFN
+* Tinker
+* Arduino
+* DigitalOcean
+* Gemma
+* Backboard
+* ElevenLabs
+* Entire
+* GitHub Copilot
+* Mastra
+* MongoDB Atlas
+* Sentry Agent Tracing
+* SerpApi
+* a .tech Domain
+* Temporal
+* Tiger Data
+
+## Frequently Asked Questions
+
+### The Five Challenges
+
+#### Do pull requests count this year?
+
+No. This year's Hacktoberfest is not about open source pull requests. There's no PR count to hit and no repos to hunt for. Instead, you build a brand-new project with open-source AI at its core, and write about it on DEV. Here's everything you need to know about Hacktoberfest 2026.
+
+#### How do the Hacktoberfest challenges work?
+
+We're running five DEV Challenges back to back through October: a Weekend Challenge to start (October 2 to 5), then a new challenge every Monday (October 5, 12, 19 and 26). Every challenge uses the same prompt, and each one gets its own theme. We reveal each theme the day its challenge launches. See all five on the HF26 DEV Challenge Hub.
+
+#### What's the prompt?
+
+The same for all five challenges: build something with open-source AI at its core (an open-weight model, an open-source agent harness or framework, local inference, or any mix), and tell us why open innovation matters for what you built.
+
+#### Can I enter more than one challenge?
+
+Yes, enter as many as you like. You can publish **one submission per challenge**, so that's up to five in October. Each submission has to be a new project built during that challenge's window.
+
+#### Can one submission win more than once?
+
+No. Each submission is automatically in the running for the overall prize and every partner category it qualifies for, but you can win once per challenge, and we'll aim to celebrate as many different builders as possible across the month.
+
+#### I'm joining late. Is it worth it?
+
+Absolutely. Every challenge is a fresh start, so someone who finds us in week four competes on the same footing as someone who's been here since day one.
+
+### Prizes and Partner Categories
+
+#### What can I win?
+
+Every challenge has its own winners, and we'll share each challenge's prizes when it launches. Here's what's up for grabs in the Weekend Challenge:
+
+* **Overall winner:** $250, a DEV++ membership, and an exclusive DEV badge.
+* **Featured partner categories:** $200 for each winner.
+* **Partner categories:** $100 for each winner.
+
+Every winner also gets an exclusive DEV badge, and **everyone** with a valid submission gets a completion badge.
+
+#### How do partner categories work?
+
+You opt in by using the partner's technology in your project and listing each category you're entering in the Prize Categories section of your post. One project can enter as many categories as it genuinely uses. You don't need to use any partner technology to win the overall prize.
+
+#### Which partner categories are open?
+
+Featured categories ($200):
+
+* Best Use of Render
+* Best Use of TabPFN
+* Best Use of Tinker
+* Best Use of Arduino
+* Best Use of DigitalOcean
+* Best Use of Gemma
+
+Partner categories ($100):
+
+* Best Use of Backboard
+* Best Use of ElevenLabs
+* Best Use of Entire
+* Best Use of GitHub Copilot
+* Best Use of Mastra
+* Best Use of MongoDB Atlas
+* Best Use of Sentry Agent Tracing
+* Best Use of SerpApi
+* Best Use of a .tech Domain
+* Best Use of Temporal
+* Best Use of Tiger Data
+
+Partner categories may change from challenge to challenge as new partners join. Each challenge page lists the categories open for that challenge.
+
+#### Who can enter Best Use of Arduino?
+
+Anyone building with an Arduino UNO Q, whether you got one at an in-person Fest or have your own.
+
+#### How do I claim partner credits?
+
+Several partners are giving participants credits and promo codes, including Tinker, Render, Backboard, and a free .tech domain. Claim yours at hacktoberfest.com/my/promos.
+
+### Submission
+
+#### Can I submit a pull request to an existing project?
+
+No. **New projects, not pull requests:** each submission is a new project built during that challenge's window. Pull requests to existing projects don't count this year.
+
+#### Can I work on an old project?
+
+No, all submissions and their respective repositories must be started and completed within the challenge window. Commits made after the submission deadline must be noted in the project's readme. Failure to do so may result in disqualification.
+
+#### Can I work on a team?
+
+Yes, you can work on teams of up to four people.
+
+* If you collaborate with anyone, you'll need to list their DEV handles in your submission post so we can award a badge to your entire team! **Please only publish one submission per team.**
+* DEV does not handle prize-splitting, so in the event that your submission wins, you will need to split the prize amongst yourselves. Thank you for understanding!
+
+#### Should I include my agent session?
+
+**Show your work.** We'd love to see how you built it. Save your agent session with DevRelay and embed it in your post, or link to it. It's optional, but it helps the judges understand your process.
+
+#### Can my submission include open source code?
+
+Riffing on open source code and borrowing and improving on previous work/ideas is encouraged but it's important your changes are significant enough to ensure your submission is valid.
+
+#### What happens if my submission is considered plagiarized or invalid?
+
+Anything deemed to be plagiarism will not be eligible for prizes. Incidental plagiarism may simply result in your disqualification from the challenge (regardless of the number of other valid submissions you have published). Egregious plagiarism will result in your suspension from DEV entirely. Any non-generic, non-trivial usage of prior work, including open source code must be credited in your submission.
+
+#### Do submissions have to be in English?
+
+Non-english submissions are eligible for a completion badge but not eligible for prizes due to the current limitations of our judges. We will not be judging on mastery of the English language, so please don't let this deter you from submitting if you are not a native English speaker! We hope to evolve this in the future to be more accommodating.
+
+#### Can I use AI?
+
+Use of AI is allowed as long as all other rules are followed. We want to give you a chance to show off your skills in realistic scenarios. If you use AI tools to help you achieve your submission, all the power to you.
+
+### Eligibility
+
+#### How old do I have to be to participate?
+
+Participants need to be 18+ in order to participate.
+
+#### If I live in X, am I eligible to participate?
+
+For eligibility rules, see our official challenge rules.
+
+### Judging and Prizing
+
+#### How are submissions judged?
+
+This is DEV, so **your write-up matters most**. A great project with a thin write-up won't win. We judge on Writing Quality (weighted most heavily), Relevance to the Prompt and Theme, Creativity, Technical Execution, and, if you're entering a partner category, Use of Partner Technology.
+
+#### When are winners announced?
+
+Winners are announced the week after each challenge closes. Each challenge's page lists the week under Key Dates.
+
+#### Can there be ties?
+
+In the event of a tie in scoring between judges, the judges will select the entry that received the highest number of positive reactions on their DEV post to determine the winner.
+
+#### When will I receive my DEV badge?
+
+Both participation and winner badges will be awarded, in most cases, the same day as the winner announcement.
+
+#### When will I receive my prizes?
+
+The DEV Team will contact you via the email associated with your DEV profile within, at most, 10 business days of the announcement date to share the details of claiming your prizes.
+
+#### What steps do I need to take to receive my cash prize?
+
+The winner (including each member of a team) may be required to sign and return an affidavit of eligibility and publicity/liability release, and provide any additional tax filing information (such as a W-9, social security number or Federal tax ID number) within seven (7) business days following the date of your first email notification.
+
+### Questions
+
+#### Where can I ask questions?
+
+Drop them in the comments on the challenge's announcement post, and follow the #hf26challenge tag so you don't miss a theme reveal.
+
+##  Hacktoberfest Open-Source AI Challenge: Week 2 Rules 
+
+NO PURCHASE NECESSARY. Open only to 18+. Contest entry period ends October 18, 2026 at 11:59 PM PDT. Contest is void where prohibited or restricted by law or regulation. All entries must be submitted during the contest period. For Official Rules, see Hacktoberfest Open-Source AI Challenge: Week 2 Contest Rules and General Contest Official Rules.
+
+ Dismiss 
+
+DEV Community — A space to discuss and keep up software development and manage your software career
+
+* Home
+* DEV Challenges
+* DEV++
+* Videos
+* DEV Education Tracks
+* DEV Help
+* Advertise on DEV
+* Organization Accounts
+* DEV Showcase
+* About
+* Contact
+* Free Postgres Database
+* DEV Shop
+* MLH
+* Code of Conduct
+* Privacy Policy
+* Terms of Use
+
+Built on Forem — the open source software that powers DEV and other inclusive communities.
+
+Made with love and Ruby on Rails. DEV Community © 2016 - 2026.
+
+DEV Community 
+
+ We're a place where coders share, stay up-to-date and grow their careers.
+
+ Log in  Create account 
+____
+
+</external_links>
+<timestamp>Wednesday, Oct 14, 2026, 6:09 PM (UTC-4)</timestamp>
+
+in @d:\Documents\vscode\price-wire\ let's plan a new project for week 2 of hacktoberfest. It's for side-hustles and our focus is on ideas that people will pay for. ///
+the thesis is a that reselling is a big market, especially Facebook, Ebay, Amazon, Etsy, StockX, etc. sellers need to choose listing prices to be competitive and adjust to changing dynamics. ///
+our tools makes that easier by pooling price history for similar or exact items they are selling to solve that problem of the initial listing price. ///
+we want to use a devrelay MCP to capture our session and create our draft submission for week 2's hacktoberfest challenge, and entire (session capture) has just been enabled for this repo in @c:\Users\Administrator\.cursor\projects\d-Documents-vscode-abisoyeo\terminals\5.txt ///
+the tools we have to select for our project are on the challenge page: https://dev.to/challenges/hacktoberfest-week2-2026-10-12 except GithubCopilot, over which we used Cursor, we choose tools to work for the project, but we also validate if it is aligned with the theme and essentially meets market-fit for a paid service
+/// inside @price-wire/hacktoberfest-week2 I have made a challenge markdown resource for you to use
