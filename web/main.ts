@@ -1,3 +1,5 @@
+import { compSourceLabel } from "./comp-labels.js";
+
 type ListingFormField = {
   id: string;
   label: string;
@@ -390,7 +392,7 @@ async function loadHealth() {
     const salesDataStatus =
       dbConfigured && h.database_live
         ? "online"
-        : "offline — sample sales";
+        : "offline — practice examples";
 
     statusLine.innerHTML = [
       serviceChip(
@@ -405,7 +407,7 @@ async function loadHealth() {
       ),
       serviceChip("Sale prices", tigerState, salesDataStatus),
       serviceChip(
-        "Web search",
+        "Online listings",
         h.serpapi ? "on" : "off",
         h.serpapi ? "online" : "offline",
       ),
@@ -472,7 +474,7 @@ function renderQuote(q: Quote) {
   const rows = q.comps
     .map(
       (c) =>
-        `<tr><td>${escapeHtml(c.title)}</td><td>${c.platform}</td><td>$${c.sold_price}</td><td>${c.source}</td></tr>`,
+        `<tr><td>${escapeHtml(c.title)}</td><td>${escapeHtml(c.platform)}</td><td>$${c.sold_price}</td><td>${escapeHtml(compSourceLabel(c.source))}</td></tr>`,
     )
     .join("");
 
@@ -494,7 +496,7 @@ function renderQuote(q: Quote) {
     <p class="meta-row">${formatCompMeta(q)}</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Similar sale</th><th>Platform</th><th>Sold for</th><th>Data</th></tr></thead>
+        <thead><tr><th>Listing</th><th>Where</th><th>Price</th><th>Source</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -619,14 +621,14 @@ function renderQuote(q: Quote) {
 }
 
 function formatCompMeta(q: Quote): string {
-  const web = q.comps.filter((c) => c.source === "serpapi").length;
-  const bundled = q.comps.filter(
-    (c) => c.source === "seed" || c.source === "tiger",
-  ).length;
+  const online = q.comps.filter((c) => c.source === "serpapi").length;
+  const examples = q.comps.filter((c) => c.source === "seed").length;
+  const saved = q.comps.filter((c) => c.source === "tiger").length;
   const parts = [
-    `${q.comp_count} similar sale${q.comp_count === 1 ? "" : "s"}`,
-    web > 0 ? `${web} live store & marketplace` : null,
-    bundled > 0 && web > 0 ? `${bundled} from library` : null,
+    `${q.comp_count} listing${q.comp_count === 1 ? "" : "s"} shown`,
+    online > 0 ? `${online} online now` : null,
+    examples > 0 ? `${examples} example${examples === 1 ? "" : "s"} only` : null,
+    saved > 0 ? `${saved} from your sales` : null,
     escapeHtml(q.method_label),
   ].filter(Boolean);
   return parts.join(" · ");

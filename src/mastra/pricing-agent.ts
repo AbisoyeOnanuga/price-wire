@@ -6,6 +6,10 @@ import { searchComps, upsertSerpComps } from "../tools/comp-store.js";
 import { extractSpecs } from "../tools/extract-specs.js";
 import { fetchSerpComps } from "../tools/serp-comps.js";
 import { confidenceLabel, pricingMethodLabel, resolveMarketplaceCondition } from "../lib/conditions.js";
+import {
+  mergeCompsForDisplay,
+  mergeCompsForPricing,
+} from "../lib/comp-present.js";
 import { config } from "../config.js";
 import { buildListingBrief } from "../tools/listing-brief.js";
 import { buildListingDraft } from "../tools/listing-draft.js";
@@ -91,7 +95,7 @@ export async function runPricingPipeline(
   const marketplace = resolveMarketplaceCondition(conditionHint);
   const specs = await extractSpecs(title, marketplace.pricing_grade);
 
-  const tigerComps = await searchComps(specs, 12);
+  const libraryComps = await searchComps(specs, 5);
   let serp: Awaited<ReturnType<typeof fetchSerpComps>> = [];
   if (config.serpApiKey) {
     try {
@@ -104,18 +108,13 @@ export async function runPricingPipeline(
     }
   }
 
-  const seen = new Set<string>();
-  const merged = [...tigerComps, ...serp].filter((c) => {
-    const key = c.title.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const pricingPool = mergeCompsForPricing(serp, libraryComps, 12);
+  const prediction = await predictPrice(
+    specs,
+    pricingPool.length ? pricingPool : libraryComps.slice(0, 5),
+  );
 
-  const top = merged.slice(0, 15);
-  const prediction = await predictPrice(specs, top.length ? top : tigerComps);
-
-  const compsOut = top.length ? top : tigerComps;
+  const compsOut = mergeCompsForDisplay(serp, libraryComps);
   const listing_brief = buildListingBrief(
     title,
     specs,
@@ -142,10 +141,10 @@ export async function runPricingPipeline(
     hold_price: prediction.hold_price,
     confidence: prediction.confidence,
     confidence_label: confidenceLabel(prediction.confidence),
-    comp_count: merged.length || tigerComps.length,
+    comp_count: compsOut.length || libraryComps.length,
     method: prediction.method,
     method_label: pricingMethodLabel(prediction.method, {
-      serpCount: serp.length,
+      serpCount: compsOut.filter((c) => c.source === "serpapi").length,
     }),
     comps: compsOut,
     specs,

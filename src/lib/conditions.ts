@@ -100,7 +100,7 @@ export function pricingMethodLabel(
 ): string {
   const parts: string[] = [];
   if (opts?.usedAiExtract) parts.push("AI-assisted listing parse");
-  if ((opts?.serpCount ?? 0) > 0) parts.push("includes live web listings");
+  if ((opts?.serpCount ?? 0) > 0) parts.push("includes online listings");
   if (method === "tabpfn") {
     parts.push("smart price model");
   } else {
