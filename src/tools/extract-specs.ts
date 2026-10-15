@@ -119,23 +119,42 @@ async function extractWithOllama(title: string, conditionHint?: string): Promise
   return ExtractedSpecsSchema.parse(parsed);
 }
 
-const GOOGLE_EXTRACT_MODEL_FALLBACKS = [
+/** Gemma on Google AI Studio, then Gemini, then caller falls back to heuristics. */
+const GEMMA_EXTRACT_MODELS = [
+  "gemma-3-4b-it",
+  "gemma-3-12b-it",
+  "gemma-3-27b-it",
+  "gemma-2-9b-it",
+];
+
+const GEMINI_EXTRACT_MODELS = [
   "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
   "gemini-1.5-flash",
   "gemini-1.5-flash-8b",
 ];
+
+function googleExtractModelChain(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const m of [
+    config.googleGemmaModel,
+    ...GEMMA_EXTRACT_MODELS,
+    ...GEMINI_EXTRACT_MODELS,
+  ]) {
+    if (!m || seen.has(m)) continue;
+    seen.add(m);
+    out.push(m);
+  }
+  return out;
+}
 
 async function extractWithGoogle(title: string, conditionHint?: string): Promise<ExtractedSpecs> {
   const genAI = new GoogleGenerativeAI(config.googleApiKey);
   const prompt =
     EXTRACT_PROMPT +
     JSON.stringify({ title, condition_hint: conditionHint ?? "" });
-  const models = [
-    config.googleGemmaModel,
-    ...GOOGLE_EXTRACT_MODEL_FALLBACKS.filter(
-      (m) => m !== config.googleGemmaModel,
-    ),
-  ];
+  const models = googleExtractModelChain();
 
   let lastErr: unknown;
   for (const modelName of models) {

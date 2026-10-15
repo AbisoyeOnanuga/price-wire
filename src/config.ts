@@ -21,7 +21,7 @@ export const config = {
   tabpfnApiKey: env("TABPFN_API_KEY"),
   googleApiKey: env("GOOGLE_GENERATIVE_AI_API_KEY"),
   /** Google AI Studio model for title/spec extraction (Gemma or Gemini). */
-  googleGemmaModel: env("GOOGLE_GEMMA_MODEL", "gemini-2.5-flash"),
+  googleGemmaModel: env("GOOGLE_GEMMA_MODEL", "gemma-3-4b-it"),
   ollamaBaseUrl: env("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
   gemmaModel: env("GEMMA_MODEL", "gemma2:2b"),
   sentryDsn: env("SENTRY_DSN"),

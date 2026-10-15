@@ -625,7 +625,7 @@ function formatCompMeta(q: Quote): string {
   ).length;
   const parts = [
     `${q.comp_count} similar sale${q.comp_count === 1 ? "" : "s"}`,
-    web > 0 ? `${web} from web search` : null,
+    web > 0 ? `${web} live store & marketplace` : null,
     bundled > 0 && web > 0 ? `${bundled} from library` : null,
     escapeHtml(q.method_label),
   ].filter(Boolean);

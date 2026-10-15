@@ -95,7 +95,7 @@ export async function runPricingPipeline(
   let serp: Awaited<ReturnType<typeof fetchSerpComps>> = [];
   if (config.serpApiKey) {
     try {
-      serp = await fetchSerpComps(specs, 6);
+      serp = await fetchSerpComps(specs, 10);
       if (serp.length) {
         await upsertSerpComps(serp);
       }

@@ -7,38 +7,82 @@ function parsePrice(text: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
-export async function fetchSerpComps(
-  specs: ExtractedSpecs,
-  limit = 6,
-): Promise<CompRow[]> {
-  if (!config.serpApiKey) {
-    return [];
-  }
+function platformLabel(source: string): string {
+  const s = source.trim();
+  if (!s) return "retail";
+  return s.length > 32 ? `${s.slice(0, 29)}…` : s;
+}
 
-  const q = `${specs.search_query} ${specs.condition_grade} used`;
+async function serpGet(
+  params: Record<string, string>,
+): Promise<Record<string, unknown> | null> {
   const url = new URL("https://serpapi.com/search.json");
-  url.searchParams.set("engine", "ebay");
-  url.searchParams.set("ebay_domain", "ebay.com");
-  url.searchParams.set("_nkw", q);
+  for (const [k, v] of Object.entries(params)) {
+    url.searchParams.set(k, v);
+  }
   url.searchParams.set("api_key", config.serpApiKey);
 
   const res = await fetch(url);
   if (!res.ok) {
-    console.warn("SerpApi error", res.status);
-    return [];
+    console.warn("SerpApi error", params.engine, res.status);
+    return null;
   }
+  return (await res.json()) as Record<string, unknown>;
+}
 
-  const data = (await res.json()) as {
-    organic_results?: Array<{
+function rowsFromGoogleShopping(
+  specs: ExtractedSpecs,
+  data: Record<string, unknown>,
+  limit: number,
+): CompRow[] {
+  const results =
+    (data.shopping_results as Array<{
+      title?: string;
+      source?: string;
+      price?: string;
+      extracted_price?: number;
+    }>) ?? [];
+
+  const comps: CompRow[] = [];
+  for (const item of results.slice(0, limit)) {
+    const price =
+      item.extracted_price ??
+      (item.price ? parsePrice(item.price) : null);
+    if (!price || !item.title) continue;
+
+    comps.push(
+      CompRowSchema.parse({
+        title: item.title,
+        brand: specs.brand,
+        model_family: specs.model_family,
+        storage_gb: specs.storage_gb,
+        carrier_lock: specs.carrier_lock,
+        condition_grade: ConditionGrade.parse("new"),
+        includes_charger: specs.includes_charger,
+        platform: platformLabel(item.source ?? "Google Shopping"),
+        listed_price: price,
+        sold_price: Math.round(price * 0.92),
+        days_on_market: null,
+        source: "serpapi",
+      }),
+    );
+  }
+  return comps;
+}
+
+function rowsFromEbay(
+  specs: ExtractedSpecs,
+  data: Record<string, unknown>,
+  limit: number,
+): CompRow[] {
+  const results =
+    (data.organic_results as Array<{
       title?: string;
       price?: { raw?: string; extracted?: number };
       condition?: string;
-    }>;
-  };
+    }>) ?? [];
 
-  const results = data.organic_results ?? [];
   const comps: CompRow[] = [];
-
   for (const item of results.slice(0, limit)) {
     const price =
       item.price?.extracted ??
@@ -48,7 +92,8 @@ export async function fetchSerpComps(
     let condition_grade = specs.condition_grade;
     const cond = (item.condition ?? "").toLowerCase();
     if (cond.includes("new")) condition_grade = ConditionGrade.parse("new");
-    else if (cond.includes("used")) condition_grade = ConditionGrade.parse("good");
+    else if (cond.includes("used"))
+      condition_grade = ConditionGrade.parse("good");
 
     comps.push(
       CompRowSchema.parse({
@@ -59,7 +104,7 @@ export async function fetchSerpComps(
         carrier_lock: specs.carrier_lock,
         condition_grade,
         includes_charger: specs.includes_charger,
-        platform: "ebay",
+        platform: "eBay",
         listed_price: price,
         sold_price: Math.round(price * 0.97),
         days_on_market: null,
@@ -67,6 +112,51 @@ export async function fetchSerpComps(
       }),
     );
   }
-
   return comps;
+}
+
+/** Live retail (Google Shopping) + marketplace (eBay) snippets via SerpApi. */
+export async function fetchSerpComps(
+  specs: ExtractedSpecs,
+  limit = 10,
+): Promise<CompRow[]> {
+  if (!config.serpApiKey) {
+    return [];
+  }
+
+  const shoppingLimit = Math.max(4, Math.ceil(limit * 0.6));
+  const ebayLimit = Math.max(3, limit - shoppingLimit);
+  const q = specs.search_query.trim() || `${specs.brand} ${specs.model_family}`;
+
+  const [shoppingData, ebayData] = await Promise.all([
+    serpGet({
+      engine: "google_shopping",
+      q,
+      google_domain: "google.com",
+      gl: "us",
+      hl: "en",
+    }),
+    serpGet({
+      engine: "ebay",
+      ebay_domain: "ebay.com",
+      _nkw: `${q} used`,
+    }),
+  ]);
+
+  const shopping = shoppingData
+    ? rowsFromGoogleShopping(specs, shoppingData, shoppingLimit)
+    : [];
+  const ebay = ebayData ? rowsFromEbay(specs, ebayData, ebayLimit) : [];
+
+  const seen = new Set<string>();
+  const merged: CompRow[] = [];
+  for (const row of [...shopping, ...ebay]) {
+    const key = row.title.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(row);
+    if (merged.length >= limit) break;
+  }
+
+  return merged;
 }

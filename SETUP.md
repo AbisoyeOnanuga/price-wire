@@ -107,7 +107,7 @@ The form status chip **Sale prices** shows **online** when the DB answers; other
 SERPAPI_KEY=your_key
 ```
 
-Restart server. With a key set, **every quote** calls SerpApi (up to 6 eBay rows), merges into the table, and shows `serpapi` in the **Data** column. Results line includes “N from web search” when rows return.
+Restart server. With a key set, **every quote** calls SerpApi: **Google Shopping** (retail/store listings) plus **eBay** (used marketplace), merged into the similar-sales table (`serpapi` in **Data**, store name in **Platform**).
 
 ### Tier 4 — TabPFN
 
