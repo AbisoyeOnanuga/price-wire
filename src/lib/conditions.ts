@@ -1,95 +1,97 @@
 import type { ConditionGrade } from "../types.js";
 
-/** Marketplace-facing condition options (broader than pricing buckets). */
-export const MARKETPLACE_CONDITIONS: Array<{
+export type MarketplaceCondition = {
   value: string;
   label: string;
+  helper_text: string;
   pricing_grade: ConditionGrade;
   marketing_note: string;
-}> = [
+  requires_detail: boolean;
+};
+
+/** Seller-facing conditions (electronics). Detail required whenever the item is not sealed-new. */
+export const MARKETPLACE_CONDITIONS: MarketplaceCondition[] = [
   {
-    value: "new_sealed",
-    label: "New — sealed in box",
+    value: "new",
+    label: "New",
+    helper_text:
+      "Factory sealed, never used. Photos of shrink wrap and labels are enough—no wear description needed.",
     pricing_grade: "new",
-    marketing_note: "Factory sealed; include photos of shrink wrap and labels.",
+    marketing_note: "Lead with sealed packaging and included accessories in photos.",
+    requires_detail: false,
   },
   {
-    value: "new_open_box",
-    label: "New — open box",
+    value: "open_box",
+    label: "Open box",
+    helper_text:
+      "Unused but the box was opened. Say what is still inside (cables, manuals) and why the box is open.",
     pricing_grade: "new",
-    marketing_note: "Unused but packaging opened; show all included accessories.",
+    marketing_note: "Buyers worry about missing parts—list everything in the box.",
+    requires_detail: true,
   },
   {
-    value: "like_new",
-    label: "Like new",
-    pricing_grade: "like_new",
-    marketing_note: "Minimal signs of use; near-new presentation in photos.",
-  },
-  {
-    value: "excellent",
-    label: "Excellent",
-    pricing_grade: "like_new",
-    marketing_note: "Very light wear only; call out any micro-scuffs honestly.",
-  },
-  {
-    value: "very_good",
-    label: "Very good",
+    value: "used",
+    label: "Used",
+    helper_text:
+      "Works as intended with normal wear. Describe scratches, battery health, or issues buyers will zoom in on.",
     pricing_grade: "good",
-    marketing_note: "Light cosmetic wear; works perfectly—show angles in photos.",
+    marketing_note: "Honest wear notes build trust and reduce returns.",
+    requires_detail: true,
   },
   {
-    value: "good",
-    label: "Good",
-    pricing_grade: "good",
-    marketing_note: "Normal used wear; disclose scratches or scuffs clearly.",
-  },
-  {
-    value: "acceptable",
-    label: "Acceptable",
-    pricing_grade: "fair",
-    marketing_note: "Heavy cosmetic wear but fully functional; price accordingly.",
-  },
-  {
-    value: "fair",
-    label: "Fair",
-    pricing_grade: "fair",
-    marketing_note: "Visible wear; ideal for budget buyers—be explicit in text.",
-  },
-  {
-    value: "poor",
-    label: "Poor",
-    pricing_grade: "poor",
-    marketing_note: "Major cosmetic issues; only buy if function is solid.",
+    value: "refurbished",
+    label: "Refurbished",
+    helper_text:
+      "Restored by manufacturer or seller. Note who refurbished it, warranty, and what was replaced or tested.",
+    pricing_grade: "like_new",
+    marketing_note: "Refurb buyers want paperwork and test results.",
+    requires_detail: true,
   },
   {
     value: "for_parts",
     label: "For parts / not working",
+    helper_text:
+      "Sold as-is. List every fault (won’t power on, cracked screen, etc.) so the right buyer finds it.",
     pricing_grade: "poor",
-    marketing_note: "Sold as-is; list every known fault; no returns implied.",
-  },
-  {
-    value: "manufacturer_refurbished",
-    label: "Manufacturer refurbished",
-    pricing_grade: "like_new",
-    marketing_note: "Include refurb warranty paperwork if you have it.",
-  },
-  {
-    value: "seller_refurbished",
-    label: "Seller refurbished",
-    pricing_grade: "good",
-    marketing_note: "Describe what was replaced or tested; set buyer expectations.",
+    marketing_note: "Price for parts value; assume no returns.",
+    requires_detail: true,
   },
 ];
 
-export function needsConditionDetail(value: string): boolean {
-  return value !== "new_sealed" && value !== "new_open_box";
+const LEGACY_CONDITION_MAP: Record<string, string> = {
+  new_sealed: "new",
+  new_open_box: "open_box",
+  like_new: "used",
+  excellent: "used",
+  very_good: "used",
+  good: "used",
+  acceptable: "used",
+  fair: "used",
+  poor: "used",
+  manufacturer_refurbished: "refurbished",
+  seller_refurbished: "refurbished",
+  for_parts: "for_parts",
+};
+
+export function normalizeConditionValue(value?: string): string {
+  if (!value) return "used";
+  if (MARKETPLACE_CONDITIONS.some((c) => c.value === value)) return value;
+  return LEGACY_CONDITION_MAP[value] ?? "used";
+}
+
+export function requiresConditionDetail(value?: string): boolean {
+  const v = normalizeConditionValue(value);
+  return (
+    MARKETPLACE_CONDITIONS.find((c) => c.value === v)?.requires_detail ?? true
+  );
 }
 
 export function resolveMarketplaceCondition(value?: string) {
-  const found =
-    MARKETPLACE_CONDITIONS.find((c) => c.value === value) ??
-    MARKETPLACE_CONDITIONS.find((c) => c.value === "good")!;
-  return found;
+  const normalized = normalizeConditionValue(value);
+  return (
+    MARKETPLACE_CONDITIONS.find((c) => c.value === normalized) ??
+    MARKETPLACE_CONDITIONS.find((c) => c.value === "used")!
+  );
 }
 
 export function pricingMethodLabel(method: "tabpfn" | "median_fallback"): string {

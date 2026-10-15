@@ -8,7 +8,10 @@ import { cors } from "hono/cors";
 import { config } from "./config.js";
 import { runPricingPipeline } from "./mastra/pricing-agent.js";
 import { initSentry, tracePricingRun } from "./lib/sentry.js";
-import { MARKETPLACE_CONDITIONS } from "./lib/conditions.js";
+import {
+  MARKETPLACE_CONDITIONS,
+  requiresConditionDetail,
+} from "./lib/conditions.js";
 import { PLATFORMS } from "./lib/platforms.js";
 import { seedFromCsv } from "./tools/comp-store.js";
 
@@ -44,11 +47,15 @@ app.get("/api/platforms", (c) =>
 
 app.get("/api/conditions", (c) =>
   c.json(
-    MARKETPLACE_CONDITIONS.map(({ value, label, marketing_note }) => ({
-      value,
-      label,
-      marketing_note,
-    })),
+    MARKETPLACE_CONDITIONS.map(
+      ({ value, label, marketing_note, helper_text, requires_detail }) => ({
+        value,
+        label,
+        marketing_note,
+        helper_text,
+        requires_detail,
+      }),
+    ),
   ),
 );
 
@@ -73,6 +80,18 @@ app.post("/api/quote", async (c) => {
   const title = body.title?.trim();
   if (!title) {
     return c.json({ error: "title is required" }, 400);
+  }
+  if (
+    requiresConditionDetail(body.condition) &&
+    !body.condition_detail?.trim()
+  ) {
+    return c.json(
+      {
+        error:
+          "Describe the item’s condition (wear, defects, what’s included). Required for open box, used, refurbished, and for-parts listings.",
+      },
+      400,
+    );
   }
 
   try {

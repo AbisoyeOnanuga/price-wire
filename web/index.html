@@ -21,6 +21,7 @@
     </script>
   </head>
   <body>
+    <div class="notebook-bg" aria-hidden="true"></div>
     <div class="grid-noise" aria-hidden="true"></div>
     <main class="shell">
       <div class="top-bar">
@@ -39,33 +40,33 @@
         <div class="hero-copy">
           <h1>Price <em>Wire</em></h1>
           <p class="lede">
-            Research a fair list price from similar sales, then draft a
-            sellable title and condition-led description in minutes—finish
-            photos, price, and shipping in the marketplace UI.
+            Comp-backed list price plus a five-minute draft for used
+            electronics—title, condition copy, and description. Photos, shipping,
+            and marketplace forms stay on the site you sell on.
           </p>
         </div>
-        <figure class="sample-panel">
+        <figure class="sample-panel" id="sample-panel">
           <figcaption>
             <strong>Example sales (demo)</strong>
             <span
-              >Illustrative prices from our sample dataset—not a live feed. Your
-              results use sales matched to your item.</span
+              >Illustrative sold prices from our sample dataset—not a live feed.
+              Your quote matches your title and condition.</span
             >
           </figcaption>
           <ul class="sample-list">
-            <li>
+            <li class="sample-row" data-price="235">
               <span class="tag">Headphones</span>
-              <span class="price">$235</span>
+              <span class="price demo-price">$235</span>
               <span class="muted">eBay · sold in 4 days</span>
             </li>
-            <li>
+            <li class="sample-row" data-price="315">
               <span class="tag">Phone</span>
-              <span class="price">$315</span>
+              <span class="price demo-price">$315</span>
               <span class="muted">Marketplace · 5 days</span>
             </li>
-            <li>
+            <li class="sample-row" data-price="435">
               <span class="tag">Console</span>
-              <span class="price">$435</span>
+              <span class="price demo-price">$435</span>
               <span class="muted">eBay · 8 days</span>
             </li>
           </ul>
@@ -79,44 +80,46 @@
         </div>
         <label>
           What are you selling?
+          <span class="label-helper"
+            >Electronics only for now—phones, consoles, headphones, laptops. Use
+            the words buyers search: brand, model, color, storage, unlocked.</span
+          >
           <input
             id="title"
             name="title"
             required
             autocomplete="off"
-            placeholder="Sony WH-1000XM5 black like new"
+            placeholder="Sony WH-1000XM5 black — light wear, includes case"
           />
         </label>
         <label>
           Condition
+          <span class="label-helper"
+            >Pick the bucket that matches how you will list on eBay or similar.
+            Anything that is not sealed-new needs a short condition story below.</span
+          >
           <select id="condition" name="condition" aria-describedby="condition-hint">
-            <option value="new_sealed">New — sealed in box</option>
-            <option value="new_open_box">New — open box</option>
-            <option value="like_new">Like new</option>
-            <option value="excellent">Excellent</option>
-            <option value="very_good">Very good</option>
-            <option value="good" selected>Good</option>
-            <option value="acceptable">Acceptable</option>
-            <option value="fair">Fair</option>
-            <option value="poor">Poor</option>
+            <option value="new">New (sealed)</option>
+            <option value="open_box">Open box</option>
+            <option value="used" selected>Used</option>
+            <option value="refurbished">Refurbished</option>
             <option value="for_parts">For parts / not working</option>
-            <option value="manufacturer_refurbished">Manufacturer refurbished</option>
-            <option value="seller_refurbished">Seller refurbished</option>
           </select>
           <span id="condition-hint" class="field-hint"></span>
         </label>
         <label id="condition-detail-wrap" class="condition-detail-wrap hidden">
           Condition details
+          <span class="label-helper"
+            >Required for open box, used, refurbished, and for-parts items. This
+            text feeds your listing description—scratches, battery %, missing
+            parts, what is in the box.</span
+          >
           <textarea
             id="condition-detail"
             name="condition_detail"
-            rows="3"
-            placeholder="Scratches on corner, battery health 87%, includes original box but no cable…"
+            rows="4"
+            placeholder="Light scuffs on the cups, battery holds ~18 hrs, includes USB-C cable and case. No original box."
           ></textarea>
-          <span class="field-hint"
-            >Used in your listing description. Helps buyers trust the price—especially for used
-            items.</span
-          >
         </label>
         <button type="submit" id="submit-btn">
           <span class="btn-label">Get price &amp; listing draft</span>

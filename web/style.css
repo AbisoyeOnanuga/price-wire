@@ -17,6 +17,8 @@ html[data-theme="dark"] {
   --input-bg: #0c0f13;
   --card-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
   --focus-ring: rgba(212, 165, 116, 0.15);
+  --notebook-line: rgba(212, 165, 116, 0.07);
+  --notebook-margin: rgba(212, 165, 116, 0.18);
   --radius: 14px;
   --font-display: "Instrument Serif", Georgia, serif;
   --font-body: "DM Sans", "Segoe UI", sans-serif;
@@ -41,6 +43,8 @@ html[data-theme="light"] {
   --input-bg: #ffffff;
   --card-shadow: 0 16px 48px rgba(26, 22, 18, 0.08);
   --focus-ring: rgba(166, 107, 46, 0.22);
+  --notebook-line: rgba(26, 22, 18, 0.06);
+  --notebook-margin: rgba(166, 107, 46, 0.22);
 }
 
 * {
@@ -56,19 +60,51 @@ body {
   line-height: 1.45;
 }
 
+.notebook-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(3.5rem - 1px),
+      var(--notebook-margin) calc(3.5rem - 1px),
+      var(--notebook-margin) 3.5rem,
+      transparent 3.5rem
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 27px,
+      var(--notebook-line) 27px,
+      var(--notebook-line) 28px
+    );
+  background-size:
+    100% 100%,
+    100% 28px;
+  background-position: 0 0, 0 8px;
+  opacity: 1;
+}
+
 .grid-noise {
   position: fixed;
   inset: 0;
   pointer-events: none;
+  z-index: 0;
   background-image:
     linear-gradient(var(--noise) 1px, transparent 1px),
     linear-gradient(90deg, var(--noise) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(circle at 30% 20%, black, transparent 70%);
+  opacity: 0.65;
 }
 
 .shell {
   position: relative;
+  z-index: 1;
   max-width: 980px;
   margin: 0 auto;
   padding: clamp(1.5rem, 4vw, 3rem) 1.25rem 4rem;
@@ -142,6 +178,18 @@ body {
   border-radius: var(--radius);
   background: var(--bg-elevated);
   padding: 0.85rem 1rem;
+  animation: panelFloat 6s var(--ease-out) infinite;
+  box-shadow: var(--card-shadow);
+}
+
+@keyframes panelFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .sample-panel figcaption {
@@ -210,6 +258,73 @@ textarea {
 .price {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
+  color: var(--copper);
+}
+
+.demo-price {
+  animation: priceGlow 3.5s ease-in-out infinite;
+}
+
+.sample-row {
+  animation: rowFade 0.8s var(--ease-out) both;
+}
+
+.sample-row:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.sample-row:nth-child(2) {
+  animation-delay: 0.25s;
+}
+.sample-row:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes priceGlow {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 0 transparent;
+  }
+  50% {
+    opacity: 0.92;
+    text-shadow: 0 0 12px color-mix(in srgb, var(--copper) 35%, transparent);
+  }
+}
+
+@keyframes rowFade {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.stat strong.price-animate {
+  animation: tallyIn 0.7s var(--ease-out) both;
+}
+
+@keyframes tallyIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.label-helper {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .muted {

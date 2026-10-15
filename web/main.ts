@@ -76,6 +76,8 @@ type ConditionOption = {
   value: string;
   label: string;
   marketing_note: string;
+  helper_text?: string;
+  requires_detail?: boolean;
 };
 
 const form = document.querySelector<HTMLFormElement>("#quote-form")!;
@@ -104,6 +106,7 @@ updateConditionHint();
 void loadHealth();
 void loadConditions();
 initTheme();
+initDemoPriceCycle();
 
 function initTheme() {
   const root = document.documentElement;
@@ -128,7 +131,7 @@ async function loadConditions() {
     if (!res.ok) throw new Error("conditions unavailable");
     conditionOptions = (await res.json()) as ConditionOption[];
     if (conditionOptions.length > 0) {
-      const prev = conditionSelect.value || "good";
+      const prev = conditionSelect.value || "used";
       conditionSelect.innerHTML = conditionOptions
         .map(
           (o) =>
@@ -137,7 +140,7 @@ async function loadConditions() {
         .join("");
       conditionSelect.value = conditionOptions.some((c) => c.value === prev)
         ? prev
-        : "good";
+        : "used";
     }
   } catch {
     /* static <option> list in index.html is the fallback */
@@ -152,17 +155,36 @@ async function loadConditions() {
 }
 
 function needsConditionDetail(value: string): boolean {
-  return value !== "new_sealed" && value !== "new_open_box";
+  const match = conditionOptions.find((c) => c.value === value);
+  if (match?.requires_detail !== undefined) return match.requires_detail;
+  return value !== "new";
 }
 
 function updateConditionHint() {
   const match = conditionOptions.find((c) => c.value === conditionSelect.value);
-  conditionHint.textContent = match?.marketing_note ?? "";
+  const parts = [match?.helper_text, match?.marketing_note].filter(Boolean);
+  conditionHint.textContent = parts.join(" — ");
   const showDetail = needsConditionDetail(conditionSelect.value);
   conditionDetailWrap.classList.toggle("hidden", !showDetail);
+  conditionDetailInput.required = showDetail;
   if (!showDetail) {
     conditionDetailInput.value = "";
   }
+}
+
+function initDemoPriceCycle() {
+  const prices = document.querySelectorAll<HTMLElement>(".demo-price");
+  prices.forEach((el, i) => {
+    const row = el.closest<HTMLElement>(".sample-row");
+    const base = Number(row?.dataset.price ?? el.textContent?.replace(/\D/g, ""));
+    if (!base) return;
+    let tick = 0;
+    window.setInterval(() => {
+      tick += 1;
+      const jitter = ((i + tick) % 5) - 2;
+      el.textContent = `$${base + jitter}`;
+    }, 2800 + i * 400);
+  });
 }
 
 async function loadHealth() {
@@ -190,6 +212,12 @@ form.addEventListener("submit", async (e) => {
   const condition_detail = needsConditionDetail(condition)
     ? conditionDetailInput.value.trim()
     : "";
+
+  if (needsConditionDetail(condition) && !condition_detail) {
+    conditionDetailInput.focus();
+    conditionDetailWrap.classList.remove("hidden");
+    return;
+  }
 
   submitBtn.disabled = true;
   results.classList.remove("hidden");
@@ -236,9 +264,9 @@ function renderQuote(q: Quote) {
   results.innerHTML = `
     <h2 class="results-title">Price &amp; listing setup</h2>
     <div class="price-grid">
-      <div class="stat featured"><span>Suggested price</span><strong>$${q.suggested_price}</strong></div>
-      <div class="stat"><span>Quick sale</span><strong>$${q.quick_sale_price}</strong></div>
-      <div class="stat"><span>Hold firm</span><strong>$${q.hold_price}</strong></div>
+      <div class="stat featured"><span>Suggested price</span><strong class="price-animate">$${q.suggested_price}</strong></div>
+      <div class="stat"><span>Quick sale</span><strong class="price-animate" style="animation-delay:0.08s">$${q.quick_sale_price}</strong></div>
+      <div class="stat"><span>Hold firm</span><strong class="price-animate" style="animation-delay:0.16s">$${q.hold_price}</strong></div>
       <div class="stat"><span>Match quality</span><strong>${escapeHtml(q.confidence_label)}</strong></div>
     </div>
     <p class="meta-row">${q.comp_count} similar sale${q.comp_count === 1 ? "" : "s"} · ${escapeHtml(q.method_label)}</p>
@@ -252,7 +280,7 @@ function renderQuote(q: Quote) {
     <div class="draft-block listing-setup">
       <h3>Five-minute listing draft</h3>
       <p class="field-hint">${escapeHtml(q.listing_draft.condition_marketing_tip)}</p>
-      <p class="setup-lede">Copy field-by-field into the marketplace UI (title first, then condition-driven description). Price goes in the site’s price box—not the description. Photos, shipping services, and shop policies stay on the platform.</p>
+      <p class="setup-lede">Prototype focus: <strong>price band</strong> and <strong>description copy</strong> for electronics. Paste title and description field-by-field; add category specifics only where the marketplace asks.</p>
       <div id="price-fields" class="price-fields-copy"></div>
       <div class="platform-tabs" role="tablist" aria-label="Marketplace">${platformTabs}</div>
       <div id="platform-packet" class="platform-packet"></div>

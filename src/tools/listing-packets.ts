@@ -29,14 +29,12 @@ export type PlatformListingPacket = {
   label: string;
   tagline: string;
   sections: ListingFormSection[];
-  /** Title + description only — not a full marketplace form. */
   copy_essentials_text: string;
 };
 
 export type ListingSetup = {
   default_platform: PlatformId;
   platforms: Array<{ id: PlatformId; label: string; tagline: string }>;
-  /** Price band for the site's price field (never mixed into description). */
   price_fields: ListingFormSection;
   packets: Record<PlatformId, PlatformListingPacket>;
 };
@@ -64,158 +62,95 @@ function essentialsText(title: string, description: string): string {
 function buildPriceFields(prediction: PricePrediction): ListingFormSection {
   return {
     id: "pricing",
-    title: "List price",
+    title: "List price (main value prop)",
     description:
-      "Enter these in the marketplace price field. Pricing research stays above; do not paste into the item description unless you are making a value case.",
+      "Price Wire’s comp band for electronics in this condition. Paste into the marketplace price field—not into your description.",
     fields: [
       field("suggested_price", "Suggested", `$${prediction.suggested_price}`, {
-        hint: "Default ask from similar sales",
+        hint: "Starting ask from similar electronics sales in our sample pool",
       }),
       field("quick_sale_price", "Quick sale", `$${prediction.quick_sale_price}`, {
-        hint: "If you need it gone faster",
+        hint: "Lower if you need a faster sale",
       }),
       field("hold_price", "Hold firm", `$${prediction.hold_price}`, {
-        hint: "If you can wait for a better offer",
+        hint: "Higher if you can wait for the right buyer",
       }),
     ],
   };
 }
 
-function coreSpecifics(draft: ListingDraft): string {
-  return Object.entries(draft.item_specifics)
-    .map(([k, v]) => `${k}: ${v}`)
-    .join("\n");
+function optionalSpecifics(draft: ListingDraft): string {
+  const entries = Object.entries(draft.item_specifics);
+  if (!entries.length) {
+    return "Add brand/model in the marketplace form when prompted—category-specific fields vary by site.";
+  }
+  return entries.map(([k, v]) => `${k}: ${v}`).join("\n");
 }
 
-function ebaySections(
+function coreCopySections(
   draft: ListingDraft,
   marketplaceConditionValue: string,
+  platform: PlatformId,
 ): ListingFormSection[] {
-  const cond = platformConditionLabel("ebay", marketplaceConditionValue);
-  const title = truncateTitle(draft.title, platformTitleLimit("ebay"));
-  const ship = draft.shipping;
+  const cond = platformConditionLabel(platform, marketplaceConditionValue);
+  const title = truncateTitle(draft.title, platformTitleLimit(platform));
 
-  return [
+  const sections: ListingFormSection[] = [
     {
       id: "listing_copy",
-      title: "Listing copy (slow fields first)",
+      title: "What to paste first",
       description:
-        "eBay handles shipping services in its own UI. Focus on title, condition, item specifics, and description.",
+        "Electronics listings win on search title, honest condition copy, and a fair price. Marketplace category specifics (MPN, carrier, etc.) come later in each site’s form.",
       fields: [
         field("title", "Title", title, {
-          max_length: 80,
-          hint: "Priority #1 — search-friendly, under 80 characters",
+          max_length: platformTitleLimit(platform),
+          hint: "Search-friendly: brand, model, storage, unlocked—check character limit for this site",
         }),
         field("condition", "Condition", cond, {
-          hint: "Match eBay’s condition dropdown",
-        }),
-        field("item_specifics", "Item specifics (core)", coreSpecifics(draft), {
-          multiline: true,
-          hint: "Brand, model, storage — skip blanks you do not need",
+          hint: "Pick the closest dropdown option on the marketplace",
         }),
         field("description", "Description", draft.description, {
           multiline: true,
-          hint: "Condition-driven copy; add photos, policies, and your shop voice",
+          hint: "Condition-led story for buyers; add your shop policies before publishing",
         }),
       ],
     },
     {
-      id: "package_optional",
-      title: "Package size (only if prompted)",
+      id: "optional_specifics",
+      title: "Optional electronics specifics",
       description:
-        "Some flows ask for packed weight or dimensions for calculated shipping. Skip if eBay uses your business policy or flat rate.",
+        "Only if the form asks—skip blanks you do not need. Full category catalogs are out of scope for this prototype.",
+      fields: [
+        field("item_specifics", "Starter specifics", optionalSpecifics(draft), {
+          multiline: true,
+          hint: "Edit or replace with what your category requires (phones vs consoles vs headphones)",
+        }),
+      ],
+    },
+  ];
+
+  if (platform === "ebay") {
+    const ship = draft.shipping;
+    sections.push({
+      id: "package_optional",
+      title: "Package size (if prompted)",
+      description:
+        "Some eBay flows ask for weight or dimensions. Skip if you use a business shipping policy or flat rate.",
       fields: [
         field(
           "package_dims",
           "Dimensions (L × W × H)",
           `${ship.length_in} × ${ship.width_in} × ${ship.height_in} in`,
+          { hint: "Estimate for packed box—measure yours before labels" },
         ),
-        field("package_weight", "Weight", `~${ship.weight_lb} lb packed`),
-      ],
-    },
-  ];
-}
-
-function etsySections(
-  draft: ListingDraft,
-  marketplaceConditionValue: string,
-): ListingFormSection[] {
-  const cond = platformConditionLabel("etsy", marketplaceConditionValue);
-  const title = truncateTitle(draft.title, platformTitleLimit("etsy"));
-  const brand = draft.item_specifics.Brand ?? "Electronics";
-  const model = draft.item_specifics.Model ?? "";
-
-  const tags = [brand, model, "electronics", "used electronics", "tech resale"]
-    .map((t) => t.replace(/\s+/g, " ").trim())
-    .filter(Boolean)
-    .slice(0, 13)
-    .join(", ");
-
-  return [
-    {
-      id: "listing_copy",
-      title: "Listing copy",
-      fields: [
-        field("title", "Title", title, { max_length: 140 }),
-        field("description", "Description", draft.description, { multiline: true }),
-        field("tags", "Tags (optional)", tags, {
-          hint: "Up to 13 — only if you sell on Etsy",
+        field("package_weight", "Weight", `~${ship.weight_lb} lb packed`, {
+          hint: "Weigh after packing; carriers bill on actual weight",
         }),
       ],
-    },
-    {
-      id: "etsy_details",
-      title: "Extra Etsy fields (if required)",
-      fields: [
-        field("condition", "Condition", cond),
-        field("who_made", "Who made it?", "Someone else"),
-      ],
-    },
-  ];
-}
+    });
+  }
 
-function stockxSections(
-  draft: ListingDraft,
-  marketplaceConditionValue: string,
-): ListingFormSection[] {
-  const cond = platformConditionLabel("stockx", marketplaceConditionValue);
-
-  return [
-    {
-      id: "stockx_match",
-      title: "Catalog match",
-      description: "StockX is SKU-first — search, then confirm variant in their UI.",
-      fields: [
-        field(
-          "search",
-          "Search",
-          `${draft.item_specifics.Brand ?? ""} ${draft.item_specifics.Model ?? draft.title}`.trim(),
-        ),
-        field("condition", "Condition", cond),
-      ],
-    },
-  ];
-}
-
-function facebookSections(
-  draft: ListingDraft,
-  marketplaceConditionValue: string,
-): ListingFormSection[] {
-  const cond = platformConditionLabel("facebook", marketplaceConditionValue);
-  const title = truncateTitle(draft.title, platformTitleLimit("facebook"));
-
-  return [
-    {
-      id: "listing_copy",
-      title: "Listing copy",
-      description: "Delivery and meetup are set in Facebook’s UI, not here.",
-      fields: [
-        field("title", "Title", title, { max_length: 100 }),
-        field("condition", "Condition", cond),
-        field("description", "Description", draft.description, { multiline: true }),
-      ],
-    },
-  ];
+  return sections;
 }
 
 function buildPacket(
@@ -243,27 +178,15 @@ export function buildListingSetup(
   const packets = {} as Record<PlatformId, PlatformListingPacket>;
 
   for (const meta of PLATFORMS) {
-    let sections: ListingFormSection[];
-    let titleForCopy = draft.title;
-    switch (meta.id) {
-      case "ebay":
-        titleForCopy = truncateTitle(draft.title, platformTitleLimit("ebay"));
-        sections = ebaySections(draft, marketplaceConditionValue);
-        break;
-      case "etsy":
-        titleForCopy = truncateTitle(draft.title, platformTitleLimit("etsy"));
-        sections = etsySections(draft, marketplaceConditionValue);
-        break;
-      case "stockx":
-        sections = stockxSections(draft, marketplaceConditionValue);
-        break;
-      case "facebook":
-        titleForCopy = truncateTitle(draft.title, platformTitleLimit("facebook"));
-        sections = facebookSections(draft, marketplaceConditionValue);
-        break;
-      default:
-        sections = [];
-    }
+    const titleForCopy = truncateTitle(
+      draft.title,
+      platformTitleLimit(meta.id),
+    );
+    const sections = coreCopySections(
+      draft,
+      marketplaceConditionValue,
+      meta.id,
+    );
     packets[meta.id] = buildPacket(
       meta.id,
       meta,
