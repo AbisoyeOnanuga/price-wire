@@ -119,17 +119,38 @@ async function extractWithOllama(title: string, conditionHint?: string): Promise
   return ExtractedSpecsSchema.parse(parsed);
 }
 
+const GOOGLE_EXTRACT_MODEL_FALLBACKS = [
+  "gemini-2.5-flash",
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-8b",
+];
+
 async function extractWithGoogle(title: string, conditionHint?: string): Promise<ExtractedSpecs> {
   const genAI = new GoogleGenerativeAI(config.googleApiKey);
-  const model = genAI.getGenerativeModel({ model: "gemma-2-2b-it" });
-  const result = await model.generateContent(
+  const prompt =
     EXTRACT_PROMPT +
-      JSON.stringify({ title, condition_hint: conditionHint ?? "" }),
-  );
-  const text = result.response.text();
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  const parsed = JSON.parse(jsonMatch?.[0] ?? "{}");
-  return ExtractedSpecsSchema.parse(parsed);
+    JSON.stringify({ title, condition_hint: conditionHint ?? "" });
+  const models = [
+    config.googleGemmaModel,
+    ...GOOGLE_EXTRACT_MODEL_FALLBACKS.filter(
+      (m) => m !== config.googleGemmaModel,
+    ),
+  ];
+
+  let lastErr: unknown;
+  for (const modelName of models) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const parsed = JSON.parse(jsonMatch?.[0] ?? "{}");
+      return ExtractedSpecsSchema.parse(parsed);
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr;
 }
 
 export async function extractSpecs(

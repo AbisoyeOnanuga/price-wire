@@ -1,5 +1,5 @@
-import pg from "pg";
 import { config } from "../config.js";
+import { createPgPoolSingleConnection } from "./pg-pool.js";
 
 let ollamaReachable: boolean | null = null;
 let ollamaCheckedAt = 0;
@@ -41,11 +41,7 @@ export function integrationFlags() {
 /** True only when DATABASE_URL is set and a connection succeeds. */
 export async function isDatabaseLive(): Promise<boolean> {
   if (!config.databaseUrl) return false;
-  const pool = new pg.Pool({
-    connectionString: config.databaseUrl,
-    max: 1,
-    connectionTimeoutMillis: 2500,
-  });
+  const pool = createPgPoolSingleConnection();
   try {
     await pool.query("SELECT 1");
     return true;

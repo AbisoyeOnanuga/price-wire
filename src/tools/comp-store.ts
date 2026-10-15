@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import pg from "pg";
+import type pg from "pg";
 import { config, hasDatabase } from "../config.js";
+import { createPgPool } from "../lib/pg-pool.js";
 import type { CompRow, ExtractedSpecs } from "../types.js";
 import { CompRowSchema, ConditionGrade } from "../types.js";
 import {
@@ -22,7 +23,7 @@ let memoryComps: CompRow[] | null = null;
 
 function getPool(): pg.Pool {
   if (!pool) {
-    pool = new pg.Pool({ connectionString: config.databaseUrl });
+    pool = createPgPool();
   }
   return pool;
 }
@@ -194,43 +195,55 @@ export async function searchComps(
 }
 
 export async function upsertSerpComps(comps: CompRow[]): Promise<void> {
-  if (!hasDatabase() || comps.length === 0) {
+  if (comps.length === 0) return;
+
+  const mergeIntoMemory = () => {
     memoryComps = [...comps, ...getMemoryComps()].slice(0, 200);
+  };
+
+  if (!hasDatabase()) {
+    mergeIntoMemory();
     return;
   }
-  const client = await getPool().connect();
+
   try {
-    for (const c of comps) {
-      const search_text = compSearchText(c);
-      const embedding = textEmbedding(search_text);
-      await client.query(
-        `
-        INSERT INTO comps (
-          title, brand, model_family, storage_gb, carrier_lock, condition_grade,
-          includes_charger, platform, listed_price, sold_price, days_on_market,
-          source, search_text, embedding
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::vector)
-        `,
-        [
-          c.title,
-          c.brand,
-          c.model_family,
-          c.storage_gb,
-          c.carrier_lock,
-          c.condition_grade,
-          c.includes_charger,
-          c.platform,
-          c.listed_price,
-          c.sold_price,
-          c.days_on_market,
-          c.source,
-          search_text,
-          vectorLiteral(embedding),
-        ],
-      );
+    const client = await getPool().connect();
+    try {
+      for (const c of comps) {
+        const search_text = compSearchText(c);
+        const embedding = textEmbedding(search_text);
+        await client.query(
+          `
+          INSERT INTO comps (
+            title, brand, model_family, storage_gb, carrier_lock, condition_grade,
+            includes_charger, platform, listed_price, sold_price, days_on_market,
+            source, search_text, embedding
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::vector)
+          `,
+          [
+            c.title,
+            c.brand,
+            c.model_family,
+            c.storage_gb,
+            c.carrier_lock,
+            c.condition_grade,
+            c.includes_charger,
+            c.platform,
+            c.listed_price,
+            c.sold_price,
+            c.days_on_market,
+            c.source,
+            search_text,
+            vectorLiteral(embedding),
+          ],
+        );
+      }
+    } finally {
+      client.release();
     }
-  } finally {
-    client.release();
+  } catch (err) {
+    console.warn("Serp comp upsert failed, keeping in memory for this run:", err);
+    mergeIntoMemory();
   }
 }
 
