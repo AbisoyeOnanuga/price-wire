@@ -6,8 +6,10 @@ import { searchComps, upsertSerpComps } from "../tools/comp-store.js";
 import { extractSpecs } from "../tools/extract-specs.js";
 import { fetchSerpComps } from "../tools/serp-comps.js";
 import { confidenceLabel, pricingMethodLabel, resolveMarketplaceCondition } from "../lib/conditions.js";
+import { config } from "../config.js";
 import { buildListingBrief } from "../tools/listing-brief.js";
 import { buildListingDraft } from "../tools/listing-draft.js";
+import { buildListingSetup } from "../tools/listing-packets.js";
 import { predictPrice } from "../tools/tabpfn-price.js";
 import type { PriceQuote } from "../types.js";
 import { PriceQuoteSchema } from "../types.js";
@@ -90,7 +92,8 @@ export async function runPricingPipeline(
   const specs = await extractSpecs(title, marketplace.pricing_grade);
 
   const tigerComps = await searchComps(specs, 12);
-  const serp = await fetchSerpComps(specs, 6);
+  const needSerp = tigerComps.length < config.serpMinLocalComps;
+  const serp = needSerp ? await fetchSerpComps(specs, 6) : [];
   if (serp.length) {
     await upsertSerpComps(serp);
   }
@@ -121,6 +124,11 @@ export async function runPricingPipeline(
     marketplace.value,
     conditionDetail,
   );
+  const listing_setup = buildListingSetup(
+    listing_draft,
+    prediction,
+    marketplace.value,
+  );
 
   return PriceQuoteSchema.parse({
     suggested_price: prediction.suggested_price,
@@ -135,5 +143,6 @@ export async function runPricingPipeline(
     specs,
     listing_brief,
     listing_draft,
+    listing_setup,
   });
 }

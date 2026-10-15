@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PLATFORM_IDS } from "./lib/platforms.js";
 
 export const ConditionGrade = z.enum([
   "new",
@@ -37,6 +38,45 @@ export const CompRowSchema = z.object({
 });
 export type CompRow = z.infer<typeof CompRowSchema>;
 
+export const PlatformIdSchema = z.enum(PLATFORM_IDS);
+
+export const ListingFormFieldSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  value: z.string(),
+  hint: z.string().optional(),
+  max_length: z.number().optional(),
+  multiline: z.boolean().optional(),
+});
+
+export const ListingFormSectionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  fields: z.array(ListingFormFieldSchema),
+});
+
+export const PlatformListingPacketSchema = z.object({
+  platform: PlatformIdSchema,
+  label: z.string(),
+  tagline: z.string(),
+  sections: z.array(ListingFormSectionSchema),
+  copy_essentials_text: z.string(),
+});
+
+export const ListingSetupSchema = z.object({
+  default_platform: PlatformIdSchema,
+  platforms: z.array(
+    z.object({
+      id: PlatformIdSchema,
+      label: z.string(),
+      tagline: z.string(),
+    }),
+  ),
+  price_fields: ListingFormSectionSchema,
+  packets: z.record(PlatformIdSchema, PlatformListingPacketSchema),
+});
+
 export const ListingDraftSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -65,5 +105,7 @@ export const PriceQuoteSchema = z.object({
   specs: ExtractedSpecsSchema,
   listing_brief: z.string(),
   listing_draft: ListingDraftSchema,
+  listing_setup: ListingSetupSchema,
 });
 export type PriceQuote = z.infer<typeof PriceQuoteSchema>;
+export type ListingSetup = z.infer<typeof ListingSetupSchema>;

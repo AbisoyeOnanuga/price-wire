@@ -5,7 +5,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { secureHeaders } from "hono/secure-headers";
 import { config } from "./config.js";
+import {
+  integrationFlags,
+  isGemmaConfigured,
+} from "./lib/integration-health.js";
+import { checkRateLimit } from "./lib/rate-limit.js";
+import {
+  MAX_JSON_BODY_BYTES,
+  normalizeQuoteInput,
+} from "./lib/request-limits.js";
 import { runPricingPipeline } from "./mastra/pricing-agent.js";
 import { initSentry, tracePricingRun } from "./lib/sentry.js";
 import {
@@ -32,7 +42,55 @@ const publicDir = dirExists(builtPublic) ? builtPublic : devPublic;
 initSentry();
 
 const app = new Hono();
-app.use("/api/*", cors());
+
+app.use("*", secureHeaders());
+
+app.use("/api/*", async (c, next) => {
+  const len = c.req.header("content-length");
+  if (len && Number(len) > MAX_JSON_BODY_BYTES) {
+    return c.json({ error: "request body too large" }, 413);
+  }
+  await next();
+});
+
+app.use(
+  "/api/*",
+  cors({
+    origin: (origin) => {
+      if (!origin) {
+        return config.nodeEnv === "production" ? null : "*";
+      }
+      if (config.allowedOrigins.length > 0) {
+        return config.allowedOrigins.includes(origin) ? origin : null;
+      }
+      if (config.nodeEnv !== "production") {
+        return origin;
+      }
+      return null;
+    },
+  }),
+);
+
+function clientIp(c: { req: { header: (name: string) => string | undefined } }): string {
+  return (
+    c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
+    c.req.header("x-real-ip") ||
+    "unknown"
+  );
+}
+
+function authorizeQuote(c: {
+  req: { header: (name: string) => string | undefined };
+}): boolean {
+  if (!config.quoteApiKey) {
+    return true;
+  }
+  const auth = c.req.header("authorization");
+  if (!auth?.startsWith("Bearer ")) {
+    return false;
+  }
+  return auth.slice("Bearer ".length) === config.quoteApiKey;
+}
 
 app.get("/api/platforms", (c) =>
   c.json(
@@ -59,31 +117,60 @@ app.get("/api/conditions", (c) =>
   ),
 );
 
-app.get("/api/health", (c) =>
-  c.json({
+app.get("/api/health", async (c) => {
+  const verbose =
+    config.nodeEnv !== "production" || c.req.query("verbose") === "1";
+  if (!verbose) {
+    return c.json({ ok: true, service: "price-wire" });
+  }
+  const flags = integrationFlags();
+  const gemma = await isGemmaConfigured();
+  return c.json({
     ok: true,
     service: "price-wire",
-    database: Boolean(config.databaseUrl),
-    serpapi: Boolean(config.serpApiKey),
-    tabpfn: Boolean(config.tabpfnApiKey),
-    gemma: Boolean(config.googleApiKey) || Boolean(config.ollamaBaseUrl),
+    database: flags.database,
+    serpapi: flags.serpapi,
+    tabpfn: flags.tabpfn,
+    gemma,
+    google_gemma: flags.google_gemma,
+    ollama_enabled: flags.ollama_enabled,
     mastra: true,
-  }),
-);
+  });
+});
 
 app.post("/api/quote", async (c) => {
+  if (!authorizeQuote(c)) {
+    return c.json({ error: "unauthorized" }, 401);
+  }
+
+  const rate = checkRateLimit(
+    `quote:${clientIp(c)}`,
+    config.quoteRateLimit,
+    60_000,
+  );
+  if (!rate.allowed) {
+    return c.json(
+      { error: "too many requests; try again shortly" },
+      429,
+      rate.retryAfterSec
+        ? { "Retry-After": String(rate.retryAfterSec) }
+        : undefined,
+    );
+  }
+
   const body = await c.req.json<{
     title?: string;
     condition?: string;
     condition_detail?: string;
   }>();
-  const title = body.title?.trim();
-  if (!title) {
-    return c.json({ error: "title is required" }, 400);
+  const normalized = normalizeQuoteInput(body);
+  if ("error" in normalized) {
+    return c.json({ error: normalized.error }, 400);
   }
+
   if (
-    requiresConditionDetail(body.condition) &&
-    !body.condition_detail?.trim()
+    requiresConditionDetail(normalized.condition) &&
+    !normalized.condition_detail
   ) {
     return c.json(
       {
@@ -95,16 +182,17 @@ app.post("/api/quote", async (c) => {
   }
 
   try {
-    const quote = await tracePricingRun(title, () =>
-      runPricingPipeline(title, body.condition, body.condition_detail),
+    const quote = await tracePricingRun(normalized.title, () =>
+      runPricingPipeline(
+        normalized.title,
+        normalized.condition,
+        normalized.condition_detail,
+      ),
     );
     return c.json(quote);
   } catch (err) {
     console.error(err);
-    return c.json(
-      { error: err instanceof Error ? err.message : "pricing failed" },
-      500,
-    );
+    return c.json({ error: "pricing failed; try again later" }, 500);
   }
 });
 

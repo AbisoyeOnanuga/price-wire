@@ -7,7 +7,7 @@ export function initSentry(): void {
   if (initialized || !config.sentryDsn) return;
   Sentry.init({
     dsn: config.sentryDsn,
-    tracesSampleRate: 1.0,
+    tracesSampleRate: config.nodeEnv === "production" ? 0.15 : 1.0,
     environment: config.nodeEnv,
   });
   initialized = true;

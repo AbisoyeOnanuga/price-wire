@@ -189,7 +189,7 @@ function initDemoPriceCycle() {
 
 async function loadHealth() {
   try {
-    const res = await fetch("/api/health");
+    const res = await fetch("/api/health?verbose=1");
     const h = (await res.json()) as Health;
     const parts = [
       h.gemma ? '<span class="on">Gemma</span>' : "Gemma off",
@@ -240,7 +240,7 @@ form.addEventListener("submit", async (e) => {
     }
     renderQuote(data);
   } catch (err) {
-    results.innerHTML = `<p class="error">${err instanceof Error ? err.message : "Unknown error"}</p>`;
+    results.innerHTML = `<p class="error">${escapeHtml(err instanceof Error ? err.message : "Unknown error")}</p>`;
   } finally {
     submitBtn.disabled = false;
   }

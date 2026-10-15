@@ -118,8 +118,8 @@ function buildOptimizedTitle(
 export function buildListingDraft(
   rawTitle: string,
   specs: ExtractedSpecs,
-  prediction: PricePrediction,
-  comps: CompRow[],
+  _prediction: PricePrediction,
+  _comps: CompRow[],
   marketplaceConditionValue: string,
   conditionDetail?: string,
 ): ListingDraft {
@@ -147,11 +147,6 @@ export function buildListingDraft(
       specs.includes_charger ? "Yes (per listing)" : "Not stated—update if included",
   };
 
-  const soldRange =
-    comps.length > 0
-      ? `Recent similar sales clustered around $${prediction.suggested_price}.`
-      : "Limited sales data—price using your own research.";
-
   const description = [
     `${title}`,
     "",
@@ -168,9 +163,6 @@ export function buildListingDraft(
     conditionDetail?.trim()
       ? conditionDetail.trim()
       : "Photos show actual item. Message me with questions before buying.",
-    "",
-    "Pricing context",
-    `${soldRange} Listed at $${prediction.suggested_price} (quick sale ~$${prediction.quick_sale_price}, firm hold ~$${prediction.hold_price}).`,
     "",
     "Shipping",
     `Packed size about ${shipping.length_in}×${shipping.width_in}×${shipping.height_in} in, ~${shipping.weight_lb} lb.`,
