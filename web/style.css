@@ -30,6 +30,9 @@ html[data-theme="light"] {
   --font-display: "Instrument Serif", Georgia, serif;
   --font-body: "DM Sans", "Segoe UI", sans-serif;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dev-badge-bg: #0f0f0f;
+  --dev-badge-fg: #ffffff;
+  --dev-badge-fg-hover: #fffdf8;
 }
 
 html[data-theme="dark"] {
@@ -59,6 +62,9 @@ html[data-theme="dark"] {
   --btn-fg: #1c140c;
   --btn-border: rgba(140, 107, 74, 0.45);
   --btn-hover-bg: #e0b88a;
+  --dev-badge-bg: #f3f0e8;
+  --dev-badge-fg: #0a0c0f;
+  --dev-badge-fg-hover: #0a0c0f;
 }
 
 * {
@@ -196,12 +202,17 @@ body {
   transition: color 0.15s var(--ease-out);
 }
 
+.dev-logo-bg {
+  fill: currentColor;
+}
+
 .dev-logo-text {
+  fill: var(--dev-badge-fg);
   transition: fill 0.15s var(--ease-out);
 }
 
 .fine-link-dev {
-  color: #0f0f0f;
+  color: var(--dev-badge-bg);
 }
 
 .fine-link-dev:hover {
@@ -213,11 +224,7 @@ body {
 }
 
 .fine-link-dev:hover .dev-logo-text {
-  fill: #fffdf8;
-}
-
-html[data-theme="dark"] .fine-link-dev:not(:hover) {
-  color: #0f0f0f;
+  fill: var(--dev-badge-fg-hover);
 }
 
 .fine-sep {
