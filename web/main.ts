@@ -387,33 +387,39 @@ async function loadHealth() {
         ? "on"
         : "warn"
       : "warn";
-    const tigerDetail = dbConfigured
+    const compsDetail = dbConfigured
       ? h.database_live
-        ? "Tiger database connected"
-        : "DATABASE_URL set but not reachable"
-      : "Sample CSV comps (tier 0)";
+        ? "Searching your comp database"
+        : "Comp database not responding — using bundled sample sales"
+      : "Bundled sample sales (no database connected)";
 
     statusLine.innerHTML = [
       serviceChip(
-        "Gemma",
+        "AI copy",
         h.gemma ? "on" : "off",
-        h.gemma ? "Gemma / Ollama available" : "Gemma off",
+        h.gemma
+          ? "Assistant ready for listing text"
+          : "Assistant not connected — heuristics only",
       ),
       serviceChip(
-        "TabPFN",
+        "Smart price",
         h.tabpfn ? "on" : "off",
-        h.tabpfn ? "TabPFN pricing API" : "TabPFN off",
+        h.tabpfn
+          ? "ML price model connected"
+          : "Using comp-based pricing rules",
       ),
-      serviceChip("Tiger", tigerState, tigerDetail),
+      serviceChip("Comps", tigerState, compsDetail),
       serviceChip(
-        "SerpApi",
+        "Web search",
         h.serpapi ? "on" : "off",
-        h.serpapi ? "SerpApi comps" : "SerpApi off",
+        h.serpapi
+          ? "Live marketplace snippets enabled"
+          : "Live web search not connected",
       ),
     ].join("");
   } catch {
     statusLine.innerHTML =
-      '<span class="svc-status-offline">API offline — start the server with npm run dev</span>';
+      '<span class="svc-status-offline">Pricing service offline — check that the app is running</span>';
   }
 }
 

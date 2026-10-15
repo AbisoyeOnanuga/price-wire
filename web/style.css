@@ -177,8 +177,8 @@ body {
 }
 
 .fine-icon {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 1.35rem;
+  height: 1.35rem;
   opacity: 0.8;
   transition: opacity 0.15s var(--ease-out), color 0.15s var(--ease-out);
 }
@@ -189,10 +189,9 @@ body {
 
 .dev-logo {
   display: block;
-  height: 1.05rem;
-  width: 1.05rem;
+  height: 1.35rem;
+  width: 1.35rem;
   flex-shrink: 0;
-  border-radius: 6px;
   opacity: 0.88;
   transition:
     opacity 0.15s var(--ease-out),
@@ -582,12 +581,12 @@ textarea::placeholder {
 .svc-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.55rem 0.2rem 0.4rem;
+  gap: 0.45rem;
+  padding: 0.32rem 0.7rem 0.32rem 0.55rem;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface-alt) 70%, transparent);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--muted);
@@ -598,8 +597,8 @@ textarea::placeholder {
 }
 
 .svc-dot {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 0.55rem;
+  height: 0.55rem;
   border-radius: 50%;
   background: color-mix(in srgb, var(--muted) 55%, var(--line));
   flex-shrink: 0;
