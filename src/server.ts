@@ -9,6 +9,7 @@ import { config } from "./config.js";
 import { runPricingPipeline } from "./mastra/pricing-agent.js";
 import { initSentry, tracePricingRun } from "./lib/sentry.js";
 import { MARKETPLACE_CONDITIONS } from "./lib/conditions.js";
+import { PLATFORMS } from "./lib/platforms.js";
 import { seedFromCsv } from "./tools/comp-store.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +30,17 @@ initSentry();
 
 const app = new Hono();
 app.use("/api/*", cors());
+
+app.get("/api/platforms", (c) =>
+  c.json(
+    PLATFORMS.map(({ id, label, tagline, default: isDefault }) => ({
+      id,
+      label,
+      tagline,
+      default: Boolean(isDefault),
+    })),
+  ),
+);
 
 app.get("/api/conditions", (c) =>
   c.json(

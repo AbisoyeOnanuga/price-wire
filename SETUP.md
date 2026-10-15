@@ -46,6 +46,8 @@ npm install
 
 ### Tier 0 (no keys)
 
+Use an empty `.env` or leave integration keys blank. If `OLLAMA_BASE_URL` is set but Ollama is not running (or the model is not pulled), extraction falls back to heuristics—you may see a one-line warning in `npm run smoke`; that is still tier 0.
+
 ```bash
 npm run smoke          # pipeline without server
 npm run dev            # build web + API on :8787

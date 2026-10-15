@@ -2,7 +2,7 @@
 
 ## Render
 
-1. Connect the GitHub repo and use [render.yaml](../../render.yaml) at the repository root.
+1. Connect the GitHub repo and use [render.yaml](./render.yaml) at the repository root.
 2. Set secrets in the Render dashboard:
    - `DATABASE_URL` — Tiger Data Postgres connection string (enable pgvector; run `npm run seed` once via shell or CI).
    - `GOOGLE_GENERATIVE_AI_API_KEY` or `OLLAMA_BASE_URL` — Gemma extraction.
