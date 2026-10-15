@@ -8,7 +8,6 @@ import { fetchSerpComps } from "../tools/serp-comps.js";
 import { confidenceLabel, pricingMethodLabel, resolveMarketplaceCondition } from "../lib/conditions.js";
 import { buildListingBrief } from "../tools/listing-brief.js";
 import { buildListingDraft } from "../tools/listing-draft.js";
-import { buildListingSetup } from "../tools/listing-packets.js";
 import { predictPrice } from "../tools/tabpfn-price.js";
 import type { PriceQuote } from "../types.js";
 import { PriceQuoteSchema } from "../types.js";
@@ -122,11 +121,6 @@ export async function runPricingPipeline(
     marketplace.value,
     conditionDetail,
   );
-  const listing_setup = buildListingSetup(
-    listing_draft,
-    prediction,
-    marketplace.value,
-  );
 
   return PriceQuoteSchema.parse({
     suggested_price: prediction.suggested_price,
@@ -141,6 +135,5 @@ export async function runPricingPipeline(
     specs,
     listing_brief,
     listing_draft,
-    listing_setup,
   });
 }

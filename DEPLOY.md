@@ -15,7 +15,7 @@ Build runs `npm install && npm run build`; start runs `npm run start` on port `8
 ## Tiger Data
 
 1. Create a DEV Postgres service with pgvector enabled.
-2. Run schema + seed from `apps/pricewire`:
+2. Run schema + seed from the repo root:
 
 ```bash
 export DATABASE_URL=postgresql://...

@@ -21,13 +21,13 @@ type PlatformListingPacket = {
   label: string;
   tagline: string;
   sections: ListingFormSection[];
-  copy_all_text: string;
+  copy_essentials_text: string;
 };
 
 type ListingSetup = {
   default_platform: PlatformId;
   platforms: Array<{ id: PlatformId; label: string; tagline: string }>;
-  shared_sections: ListingFormSection[];
+  price_fields: ListingFormSection;
   packets: Record<PlatformId, PlatformListingPacket>;
 };
 
@@ -40,7 +40,6 @@ type ListingDraft = {
     width_in: number;
     height_in: number;
     weight_lb: number;
-    package_note: string;
   };
   condition_label: string;
   condition_marketing_tip: string;
@@ -251,9 +250,10 @@ function renderQuote(q: Quote) {
     </div>
 
     <div class="draft-block listing-setup">
-      <h3>Paste into marketplace forms</h3>
+      <h3>Five-minute listing draft</h3>
       <p class="field-hint">${escapeHtml(q.listing_draft.condition_marketing_tip)}</p>
-      <p class="setup-lede">One item entry — shared pricing and shipping, plus fields tuned for each marketplace.</p>
+      <p class="setup-lede">Copy field-by-field into the marketplace UI (title first, then condition-driven description). Price goes in the site’s price box—not the description. Photos, shipping services, and shop policies stay on the platform.</p>
+      <div id="price-fields" class="price-fields-copy"></div>
       <div class="platform-tabs" role="tablist" aria-label="Marketplace">${platformTabs}</div>
       <div id="platform-packet" class="platform-packet"></div>
     </div>
@@ -264,45 +264,50 @@ function renderQuote(q: Quote) {
     </div>
   `;
 
+  const priceHost = document.querySelector<HTMLElement>("#price-fields");
+  if (priceHost && setup.price_fields) {
+    priceHost.innerHTML = `
+      <div class="section-group">
+        <h4 class="section-group-title">Price on the site</h4>
+        ${renderSections([setup.price_fields], "price")}
+      </div>
+    `;
+    wireCopyButtons(priceHost);
+  }
+
   let currentPlatform = activePlatform;
+
+  function wireCopyButtons(root: ParentNode) {
+    root.querySelectorAll<HTMLButtonElement>("[data-copy-target]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-copy-target");
+        const el = id ? document.getElementById(id) : null;
+        if (el) await navigator.clipboard.writeText(el.textContent ?? "");
+      });
+    });
+  }
 
   function renderPlatformPacket(platformId: PlatformId) {
     const packet = setup.packets[platformId];
     const host = document.querySelector<HTMLElement>("#platform-packet");
     if (!packet || !host) return;
 
-    const onlyPlatformSections = packet.sections.filter(
-      (s) => !setup.shared_sections.some((sh) => sh.id === s.id),
-    );
-
-    const sharedHtml = renderSections(setup.shared_sections, "shared");
-    const platformHtml = renderSections(onlyPlatformSections, platformId);
+    const platformHtml = renderSections(packet.sections, platformId);
 
     host.innerHTML = `
       <p class="platform-tagline">${escapeHtml(packet.tagline)}</p>
       <div class="section-group">
-        <h4 class="section-group-title">Same on every platform</h4>
-        ${sharedHtml}
-      </div>
-      <div class="section-group">
-        <h4 class="section-group-title">${escapeHtml(packet.label)}-specific</h4>
+        <h4 class="section-group-title">${escapeHtml(packet.label)} listing copy</h4>
         ${platformHtml}
       </div>
       <div class="copy-row">
-        <button type="button" class="ghost primary-copy" id="copy-platform-all">Copy all for ${escapeHtml(packet.label)}</button>
+        <button type="button" class="ghost primary-copy" id="copy-essentials-btn">Copy title + description</button>
       </div>
     `;
 
-    host.querySelector("#copy-platform-all")?.addEventListener("click", async () => {
-      await navigator.clipboard.writeText(packet.copy_all_text);
-    });
-
-    host.querySelectorAll<HTMLButtonElement>("[data-copy-target]").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-copy-target");
-        const el = id ? document.getElementById(id) : null;
-        if (el) await navigator.clipboard.writeText(el.textContent ?? "");
-      });
+    wireCopyButtons(host);
+    host.querySelector("#copy-essentials-btn")?.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(packet.copy_essentials_text);
     });
   }
 

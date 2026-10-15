@@ -34,7 +34,9 @@ npm run dev
 
 Open `http://localhost:8787` and try: `Sony WH-1000XM5 Wireless Headphones Black`.
 
-After pricing, use **Paste into marketplace forms** to copy eBay-, Etsy-, StockX-, or Facebook-shaped fields (shared pricing/shipping plus platform-specific sections).
+After pricing, use **Five-minute listing draft** to copy title, key item specifics, and condition-led description per platform. Price goes in the marketplace price field—not the description.
+
+Full integration guide: [SETUP.md](./SETUP.md).
 
 Smoke test without the server:
 

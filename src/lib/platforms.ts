@@ -14,23 +14,23 @@ export const PLATFORMS: PlatformMeta[] = [
   {
     id: "ebay",
     label: "eBay",
-    tagline: "Title, item specifics, condition, and shipping for the listing form",
+    tagline: "Title, condition, core item specifics, and description — shipping stays in eBay",
     default: true,
   },
   {
     id: "etsy",
     label: "Etsy",
-    tagline: "Title, tags, materials, and handmade/vintage fields",
+    tagline: "Title, description, and only the extra fields Etsy asks for",
   },
   {
     id: "stockx",
     label: "StockX",
-    tagline: "Sell flow: product match, size/box, and ask price",
+    tagline: "Catalog search and condition — price is set in their sell flow",
   },
   {
     id: "facebook",
     label: "Facebook Marketplace",
-    tagline: "Short title, condition, price, and local pickup notes",
+    tagline: "Title, condition, and description — price and delivery in Meta’s UI",
   },
 ];
 
