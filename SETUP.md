@@ -168,6 +168,23 @@ No separate microservices to run except **Ollama** (if you choose local Gemma). 
 
 ---
 
+## Mastra agent harness (HF26 — optional for now)
+
+The pricing flow already runs through `runPricingPipeline` in `src/mastra/pricing-agent.ts` (tools for comps, TabPFN, listing draft). You do **not** need a separate Mastra server for the demo UI.
+
+**Today:** telemetry is disabled (`telemetry: { enabled: false }`) so you will not see Mastra OTEL warnings on `npm run dev`.
+
+**When you want full Mastra observability later** (same timing as wiring Tiger “sale prices” and pricing rules tables):
+
+1. Read [AI Tracing](https://mastra.ai/en/docs/observability/ai-tracing/overview) (legacy Mastra telemetry is deprecated).
+2. If you run outside `mastra dev`, follow [tracing outside Mastra server](https://mastra.ai/en/docs/observability/tracing#tracing-outside-mastra-server-environment) — load their instrumentation entry or set `globalThis.___MASTRA_TELEMETRY___` in that file.
+3. Flip `telemetry: { enabled: true }` in `pricing-agent.ts` only after instrumentation is in place.
+4. Optionally add an “Agent harness” chip on the health line once OTEL exports somewhere useful (Jaeger, etc.).
+
+Until then, `/api/health` still reports `mastra: true` because the harness code is loaded; only tracing is off.
+
+---
+
 ## Deploy
 
 See [DEPLOY.md](./DEPLOY.md) for Render env vars (same keys as above).

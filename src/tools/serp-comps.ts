@@ -41,6 +41,9 @@ function rowsFromGoogleShopping(
       source?: string;
       price?: string;
       extracted_price?: number;
+      product_link?: string;
+      link?: string;
+      thumbnail?: string;
     }>) ?? [];
 
   const comps: CompRow[] = [];
@@ -64,6 +67,8 @@ function rowsFromGoogleShopping(
         sold_price: Math.round(price * 0.92),
         days_on_market: null,
         source: "serpapi",
+        listing_url: item.product_link ?? item.link ?? null,
+        thumbnail_url: item.thumbnail ?? null,
       }),
     );
   }
@@ -78,6 +83,8 @@ function rowsFromEbay(
   const results =
     (data.organic_results as Array<{
       title?: string;
+      link?: string;
+      thumbnail?: string;
       price?: { raw?: string; extracted?: number };
       condition?: string;
     }>) ?? [];
@@ -109,6 +116,8 @@ function rowsFromEbay(
         sold_price: Math.round(price * 0.97),
         days_on_market: null,
         source: "serpapi",
+        listing_url: item.link ?? null,
+        thumbnail_url: item.thumbnail ?? null,
       }),
     );
   }

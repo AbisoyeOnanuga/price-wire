@@ -82,8 +82,10 @@ Call tools to extract listing specs, search pooled comps, optionally refresh liv
 });
 
 /** Mastra harness registers the open-tool pricing workflow for HF26 partner category. */
+/** Mastra agent harness (HF26). Telemetry off until you add OTEL — see SETUP.md. */
 export const mastra = new Mastra({
   agents: { pricingAgent },
+  telemetry: { enabled: false },
 });
 
 /** Deterministic pipeline used by the HTTP API. */

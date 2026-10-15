@@ -1,4 +1,10 @@
 import { compSourceLabel } from "./comp-labels.js";
+import {
+  normalizeMarketplaceName,
+  resolveListingUrl,
+} from "./marketplace-present.js";
+
+const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
 
 type ListingFormField = {
   id: string;
@@ -64,6 +70,8 @@ type Quote = {
     sold_price: number;
     condition_grade: string;
     source: string;
+    listing_url?: string | null;
+    thumbnail_url?: string | null;
   }>;
 };
 
@@ -260,15 +268,17 @@ function pointerFromEvent(
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-async function copyWithCelebrate(
-  text: string,
-  anchor: HTMLElement,
-  ev: Event,
-) {
+async function copyWithIcon(text: string, btn: HTMLElement) {
   await navigator.clipboard.writeText(text);
-  const { x, y } = pointerFromEvent(ev, anchor);
-  spawnCelebrationParticles(x, y, { count: 32, spread: 48, soft: true });
-  showCopyPop(x, y);
+  const rect = btn.getBoundingClientRect();
+  showCopyPop(rect.left + rect.width / 2, rect.top + rect.height / 2);
+}
+
+function copyIconButton(
+  label: string,
+  extraAttrs = "",
+): string {
+  return `<button type="button" class="copy-icon-btn" ${extraAttrs} aria-label="${escapeAttr(label)}" title="${escapeAttr(label)}">${COPY_ICON_SVG}</button>`;
 }
 
 function runSubmitCelebrate(btn: HTMLButtonElement) {
@@ -470,13 +480,33 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+function renderCompRow(c: Quote["comps"][number]): string {
+  const where = normalizeMarketplaceName(c.platform);
+  const storeHref = resolveListingUrl(c.platform, c.listing_url ?? undefined);
+  const whereCell = storeHref
+    ? `<a class="comp-where-link" href="${escapeAttr(storeHref)}" target="_blank" rel="noopener noreferrer">${escapeHtml(where)}</a>`
+    : escapeHtml(where);
+
+  const thumb = c.thumbnail_url
+    ? `<img class="comp-thumb" src="${escapeAttr(c.thumbnail_url)}" alt="" loading="lazy" decoding="async" />`
+    : `<span class="comp-thumb comp-thumb--empty" aria-hidden="true"></span>`;
+
+  const listingHref =
+    c.listing_url && /^https?:\/\//i.test(c.listing_url) ? c.listing_url : null;
+  const titleInner = listingHref
+    ? `<a class="comp-title-link" href="${escapeAttr(listingHref)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title)}</a>`
+    : `<span class="comp-title-text">${escapeHtml(c.title)}</span>`;
+
+  return `<tr>
+    <td class="comp-listing-cell"><div class="comp-listing">${thumb}<div class="comp-title-wrap">${titleInner}</div></div></td>
+    <td class="comp-where-cell">${whereCell}</td>
+    <td class="comp-price-cell"><strong class="comp-price">$${c.sold_price}</strong></td>
+    <td class="comp-source-cell">${escapeHtml(compSourceLabel(c.source))}</td>
+  </tr>`;
+}
+
 function renderQuote(q: Quote) {
-  const rows = q.comps
-    .map(
-      (c) =>
-        `<tr><td>${escapeHtml(c.title)}</td><td>${escapeHtml(c.platform)}</td><td>$${c.sold_price}</td><td>${escapeHtml(compSourceLabel(c.source))}</td></tr>`,
-    )
-    .join("");
+  const rows = q.comps.map((c) => renderCompRow(c)).join("");
 
   const setup = q.listing_setup;
   const activePlatform = setup?.default_platform ?? "ebay";
@@ -511,8 +541,8 @@ function renderQuote(q: Quote) {
     </div>
 
     <div class="brief" id="brief">${escapeHtml(q.listing_brief)}</div>
-    <div class="copy-row">
-      <button type="button" class="ghost" id="copy-brief">Copy price summary</button>
+    <div class="copy-row copy-row--icon">
+      ${copyIconButton("Copy price summary", 'id="copy-brief"')}
     </div>
   `;
 
@@ -534,7 +564,7 @@ function renderQuote(q: Quote) {
       btn.addEventListener("click", async (ev) => {
         const id = btn.getAttribute("data-copy-target");
         const el = id ? document.getElementById(id) : null;
-        if (el) await copyWithCelebrate(el.textContent ?? "", btn, ev);
+        if (el) await copyWithIcon(el.textContent ?? "", btn);
       });
     });
   }
@@ -552,15 +582,15 @@ function renderQuote(q: Quote) {
         <h4 class="section-group-title">${escapeHtml(packet.label)} listing copy</h4>
         ${platformHtml}
       </div>
-      <div class="copy-row">
-        <button type="button" class="ghost primary-copy" id="copy-essentials-btn">Copy title + description</button>
+      <div class="copy-row copy-row--icon">
+        ${copyIconButton("Copy title and description", 'id="copy-essentials-btn" class="primary-copy"')}
       </div>
     `;
 
     wireCopyButtons(host);
     host.querySelector("#copy-essentials-btn")?.addEventListener("click", async (ev) => {
       const btn = ev.currentTarget as HTMLButtonElement;
-      await copyWithCelebrate(packet.copy_essentials_text, btn, ev);
+      await copyWithIcon(packet.copy_essentials_text, btn);
     });
   }
 
@@ -581,8 +611,8 @@ function renderQuote(q: Quote) {
                 <div class="draft-box-wrap${f.multiline ? " scrollable" : ""}">
                   <div class="draft-box${f.multiline ? " multiline" : ""}" id="${fieldId}">${escapeHtml(f.value)}</div>
                 </div>
-                <div class="copy-row">
-                  <button type="button" class="ghost" data-copy-target="${fieldId}">Copy ${escapeHtml(f.label)}</button>
+                <div class="copy-row copy-row--icon">
+                  ${copyIconButton(`Copy ${f.label}`, `data-copy-target="${fieldId}"`)}
                 </div>
               </div>
             `;
@@ -616,7 +646,7 @@ function renderQuote(q: Quote) {
 
   document.querySelector("#copy-brief")?.addEventListener("click", async (ev) => {
     const btn = ev.currentTarget as HTMLButtonElement;
-    await copyWithCelebrate(q.listing_brief, btn, ev);
+    await copyWithIcon(q.listing_brief, btn);
   });
 }
 

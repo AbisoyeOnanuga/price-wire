@@ -35,6 +35,8 @@ export const CompRowSchema = z.object({
   sold_price: z.number(),
   days_on_market: z.number().nullable(),
   source: z.enum(["seed", "tiger", "serpapi"]),
+  listing_url: z.string().optional().nullable(),
+  thumbnail_url: z.string().optional().nullable(),
 });
 export type CompRow = z.infer<typeof CompRowSchema>;
 
