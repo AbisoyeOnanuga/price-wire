@@ -97,7 +97,7 @@ Restart dev server. Cloud Gemma is used when the key is set (see `extract-specs.
 npm run seed
 ```
 
-Health shows **Tiger** instead of “sample sales”. Comps are read from the DB when present.
+The form status chip **Sale prices** shows **online** when the DB answers; otherwise **offline — sample sales**. URL alone is not enough—you must run `sql/schema.sql` and `npm run seed`.
 
 ### Tier 3 — SerpApi
 
@@ -120,6 +120,8 @@ When comps exist, price prediction prefers TabPFN; otherwise median fallback (me
 ```env
 SENTRY_DSN=https://...@....ingest.sentry.io/...
 ```
+
+The app uses **`@sentry/node`** on the API server (`src/lib/sentry.ts`). You do **not** need `@sentry/react` unless you add browser error reporting later.
 
 Trigger a quote and inspect the `pricing.run` span in Sentry.
 

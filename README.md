@@ -19,7 +19,7 @@ Part-time sellers on eBay, Facebook Marketplace, Amazon, and similar platforms w
 | Agent harness | Mastra tools |
 | Hosting | Render (`render.yaml`) |
 | Observability | Sentry (optional) |
-| Build sessions | Entire + Cursor hooks |
+| Session transcript (DEV) | DevRelay agent session — see `hacktoberfest-week2/DEVRELAY-SESSION.md` |
 
 ## Quick start
 

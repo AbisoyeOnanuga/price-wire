@@ -280,9 +280,9 @@ function runSubmitCelebrate(btn: HTMLButtonElement) {
 function serviceChip(
   name: string,
   state: "on" | "off" | "warn",
-  detail: string,
+  statusText: string,
 ): string {
-  return `<span class="svc-chip svc-${state}" title="${escapeAttr(detail)}"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">${escapeHtml(name)}</span><span class="visually-hidden">${escapeHtml(detail)}</span></span>`;
+  return `<span class="svc-chip svc-${state}" title="${escapeAttr(`${name}: ${statusText}`)}"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">${escapeHtml(name)}</span><span class="svc-status-text">${escapeHtml(statusText)}</span></span>`;
 }
 
 function initInteractiveDemoPanel() {
@@ -387,39 +387,32 @@ async function loadHealth() {
         ? "on"
         : "warn"
       : "warn";
-    const compsDetail = dbConfigured
-      ? h.database_live
-        ? "Searching your comp database"
-        : "Comp database not responding — using bundled sample sales"
-      : "Bundled sample sales (no database connected)";
+    const salesDataStatus =
+      dbConfigured && h.database_live
+        ? "online"
+        : "offline — sample sales";
 
     statusLine.innerHTML = [
       serviceChip(
-        "AI copy",
+        "Listing AI",
         h.gemma ? "on" : "off",
-        h.gemma
-          ? "Assistant ready for listing text"
-          : "Assistant not connected — heuristics only",
+        h.gemma ? "online" : "offline",
       ),
       serviceChip(
-        "Smart price",
+        "Price model",
         h.tabpfn ? "on" : "off",
-        h.tabpfn
-          ? "ML price model connected"
-          : "Using comp-based pricing rules",
+        h.tabpfn ? "online" : "offline — pricing rules",
       ),
-      serviceChip("Comps", tigerState, compsDetail),
+      serviceChip("Sale prices", tigerState, salesDataStatus),
       serviceChip(
         "Web search",
         h.serpapi ? "on" : "off",
-        h.serpapi
-          ? "Live marketplace snippets enabled"
-          : "Live web search not connected",
+        h.serpapi ? "online" : "offline",
       ),
     ].join("");
   } catch {
     statusLine.innerHTML =
-      '<span class="svc-status-offline">Pricing service offline — check that the app is running</span>';
+      '<span class="svc-status-offline">Offline</span>';
   }
 }
 
