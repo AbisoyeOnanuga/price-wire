@@ -195,7 +195,13 @@ app.post("/api/quote", async (c) => {
     return c.json(quote);
   } catch (err) {
     console.error(err);
-    return c.json({ error: "pricing failed; try again later" }, 500);
+    const message =
+      config.nodeEnv === "development"
+        ? err instanceof Error
+          ? err.message
+          : "pricing failed"
+        : "pricing failed; try again later";
+    return c.json({ error: message }, 500);
   }
 });
 

@@ -94,11 +94,19 @@ export function resolveMarketplaceCondition(value?: string) {
   );
 }
 
-export function pricingMethodLabel(method: "tabpfn" | "median_fallback"): string {
+export function pricingMethodLabel(
+  method: "tabpfn" | "median_fallback",
+  opts?: { serpCount?: number; usedAiExtract?: boolean },
+): string {
+  const parts: string[] = [];
+  if (opts?.usedAiExtract) parts.push("AI-assisted listing parse");
+  if ((opts?.serpCount ?? 0) > 0) parts.push("includes live web listings");
   if (method === "tabpfn") {
-    return "Estimated from similar sales (TabPFN)";
+    parts.push("smart price model");
+  } else {
+    parts.push("typical price from similar sales");
   }
-  return "Typical price from similar sales";
+  return parts.join(" · ");
 }
 
 export function confidenceLabel(level: "low" | "medium" | "high"): string {

@@ -95,6 +95,10 @@ npm run seed
 
 Or paste `sql/schema.sql` into the Tiger SQL console, then run `npm run seed` only.
 
+**SSL error** (`SELF_SIGNED_CERT_IN_CHAIN`): add `DATABASE_SSL_INSECURE=true` to `.env` (common with Tiger in local dev), then rerun `npm run db:schema` and `npm run seed`.
+
+**Quotes fail with a bad `DATABASE_URL`:** Until Tiger is fixed, **comment out or remove `DATABASE_URL`** in `.env` so the app uses bundled sample sales only (SerpApi + Google AI still work). A broken URL used to crash quotes after SerpApi; that is now handled, but removing it avoids slow failed DB attempts each request.
+
 The form status chip **Sale prices** shows **online** when the DB answers; otherwise **offline — sample sales**. URL alone is not enough—run `npm run db:schema` then `npm run seed`.
 
 ### Tier 3 — SerpApi

@@ -94,9 +94,13 @@ export async function runPricingPipeline(
   const tigerComps = await searchComps(specs, 12);
   let serp: Awaited<ReturnType<typeof fetchSerpComps>> = [];
   if (config.serpApiKey) {
-    serp = await fetchSerpComps(specs, 6);
-    if (serp.length) {
-      await upsertSerpComps(serp);
+    try {
+      serp = await fetchSerpComps(specs, 6);
+      if (serp.length) {
+        await upsertSerpComps(serp);
+      }
+    } catch (err) {
+      console.warn("SerpApi fetch failed, continuing with library sales:", err);
     }
   }
 
@@ -140,7 +144,9 @@ export async function runPricingPipeline(
     confidence_label: confidenceLabel(prediction.confidence),
     comp_count: merged.length || tigerComps.length,
     method: prediction.method,
-    method_label: pricingMethodLabel(prediction.method),
+    method_label: pricingMethodLabel(prediction.method, {
+      serpCount: serp.length,
+    }),
     comps: compsOut,
     specs,
     listing_brief,
