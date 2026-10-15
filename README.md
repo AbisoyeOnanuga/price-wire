@@ -2,7 +2,7 @@
 
 Open-source-AI pricing copilot for **electronics resellers**. Price Wire pools comparable sold and active listings so you can pick a competitive **initial list price** without guessing.
 
-Built for [Hacktoberfest Week 2 — Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12).
+Built for [Hacktoberfest Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12).
 
 ## Who pays for this?
 
