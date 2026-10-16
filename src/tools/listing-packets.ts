@@ -111,7 +111,7 @@ function coreCopySections(
         }),
         field("description", "Description", draft.description, {
           multiline: true,
-          hint: "Condition-led story for buyers; add your shop policies before publishing",
+          hint: "Paste as-is; tweak one line if your photos show something different",
         }),
       ],
     },

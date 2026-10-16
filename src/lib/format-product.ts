@@ -4,6 +4,7 @@ import type { ExtractedSpecs } from "../types.js";
 export function formatProductSummary(specs: ExtractedSpecs): string {
   const brand = specs.brand.trim();
   const model = specs.model_family.trim();
+  if (brand === "Unknown" && model) return model;
   if (!model || brand === "Unknown") {
     return model || brand || "Item";
   }

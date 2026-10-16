@@ -1,6 +1,8 @@
 import type { CompRow, ExtractedSpecs } from "../types.js";
 import type { PricePrediction } from "./tabpfn-price.js";
 import { resolveMarketplaceCondition } from "../lib/conditions.js";
+import { formatProductSummary } from "../lib/format-product.js";
+import { buildSellDescription } from "../lib/sell-copy.js";
 
 export type ShippingEstimate = {
   length_in: number;
@@ -57,14 +59,20 @@ export function estimateShipping(
 }
 
 function buildOptimizedTitle(rawTitle: string, specs: ExtractedSpecs): string {
-  const parts = [
-    specs.brand !== "Unknown" ? specs.brand : "",
-    specs.model_family,
-    specs.storage_gb ? `${specs.storage_gb}GB` : "",
-    specs.carrier_lock === "unlocked" ? "Unlocked" : "",
-  ].filter(Boolean);
-  const core = parts.join(" ").trim();
-  return core.length > 12 ? core : rawTitle.trim();
+  const summary = formatProductSummary(specs);
+  if (summary && summary !== "Item" && summary.length >= 8) {
+    const withStorage =
+      specs.storage_gb && !summary.toLowerCase().includes("gb")
+        ? `${summary} ${specs.storage_gb}GB`
+        : summary;
+    const withUnlock =
+      specs.carrier_lock === "unlocked" &&
+      !withStorage.toLowerCase().includes("unlock")
+        ? `${withStorage} Unlocked`
+        : withStorage;
+    return withUnlock.trim();
+  }
+  return rawTitle.trim().slice(0, 80);
 }
 
 export function buildListingDraft(
@@ -79,8 +87,11 @@ export function buildListingDraft(
   const shipping = estimateShipping(rawTitle, specs);
   const title = buildOptimizedTitle(rawTitle, specs);
 
+  const brandLabel =
+    specs.brand !== "Unknown" ? specs.brand : formatProductSummary(specs).split(/\s+/)[0] ?? "See title";
+
   const specifics: Record<string, string> = {
-    Brand: specs.brand,
+    Brand: brandLabel,
     Model: specs.model_family,
     ...(specs.storage_gb ? { Storage: `${specs.storage_gb}GB` } : {}),
     ...(specs.carrier_lock === "unlocked" ? { "Carrier status": "Unlocked" } : {}),
@@ -89,24 +100,12 @@ export function buildListingDraft(
       : {}),
   };
 
-  const description = [
-    `This ${specs.brand} ${specs.model_family} is listed in ${cond.label.toLowerCase()} condition.`,
-    cond.marketing_note,
-    "",
-    "What's included",
-    specs.includes_charger
-      ? "Device and charging accessories as shown in photos (edit to match what you ship)."
-      : "See photos for exactly what is included.",
-    "",
-    "Condition",
-    conditionDetail?.trim()
-      ? conditionDetail.trim()
-      : "Photos show the actual item. Ask questions before you buy.",
-    "",
-    "Add your shop policies, returns, and disclaimers here before publishing.",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const description = buildSellDescription(
+    rawTitle,
+    specs,
+    marketplaceConditionValue,
+    conditionDetail,
+  );
 
   return {
     title,

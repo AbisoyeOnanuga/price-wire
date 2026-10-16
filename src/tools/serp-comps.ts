@@ -1,4 +1,8 @@
 import { config } from "../config.js";
+import {
+  buildMarketplaceSearchQuery,
+  sanitizeTitleForSearch,
+} from "../lib/product-identity.js";
 import type { CompRow, ExtractedSpecs } from "../types.js";
 import { CompRowSchema, ConditionGrade } from "../types.js";
 
@@ -125,18 +129,12 @@ function rowsFromEbay(
 }
 
 /** Live retail (Google Shopping) + marketplace (eBay) snippets via SerpApi. */
-export async function fetchSerpComps(
+async function runSerpPair(
+  q: string,
+  shoppingLimit: number,
+  ebayLimit: number,
   specs: ExtractedSpecs,
-  limit = 10,
 ): Promise<CompRow[]> {
-  if (!config.serpApiKey) {
-    return [];
-  }
-
-  const shoppingLimit = Math.max(4, Math.ceil(limit * 0.6));
-  const ebayLimit = Math.max(3, limit - shoppingLimit);
-  const q = specs.search_query.trim() || `${specs.brand} ${specs.model_family}`;
-
   const [shoppingData, ebayData] = await Promise.all([
     serpGet({
       engine: "google_shopping",
@@ -148,7 +146,7 @@ export async function fetchSerpComps(
     serpGet({
       engine: "ebay",
       ebay_domain: "ebay.com",
-      _nkw: `${q} used`,
+      _nkw: q,
     }),
   ]);
 
@@ -164,8 +162,42 @@ export async function fetchSerpComps(
     if (seen.has(key)) continue;
     seen.add(key);
     merged.push(row);
-    if (merged.length >= limit) break;
+  }
+  return merged;
+}
+
+export async function fetchSerpComps(
+  specs: ExtractedSpecs,
+  limit = 10,
+  rawTitle?: string,
+): Promise<CompRow[]> {
+  if (!config.serpApiKey) {
+    return [];
   }
 
-  return merged;
+  const shoppingLimit = Math.max(4, Math.ceil(limit * 0.6));
+  const ebayLimit = Math.max(3, limit - shoppingLimit);
+  const primaryQ = buildMarketplaceSearchQuery(rawTitle ?? "", specs);
+  const fallbackQ = rawTitle ? sanitizeTitleForSearch(rawTitle) : "";
+
+  let merged = await runSerpPair(primaryQ, shoppingLimit, ebayLimit, specs);
+
+  if (merged.length < 3 && fallbackQ && fallbackQ !== primaryQ) {
+    const extra = await runSerpPair(
+      fallbackQ,
+      shoppingLimit,
+      ebayLimit,
+      specs,
+    );
+    const seen = new Set(merged.map((r) => r.title.toLowerCase()));
+    for (const row of extra) {
+      const key = row.title.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(row);
+      if (merged.length >= limit) break;
+    }
+  }
+
+  return merged.slice(0, limit);
 }
