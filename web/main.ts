@@ -4,7 +4,6 @@ import {
   resolveListingUrl,
 } from "./marketplace-present.js";
 
-const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
 
 type ListingFormField = {
   id: string;
@@ -268,17 +267,10 @@ function pointerFromEvent(
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-async function copyWithIcon(text: string, btn: HTMLElement) {
+async function copyFromButton(text: string, btn: HTMLElement) {
   await navigator.clipboard.writeText(text);
   const rect = btn.getBoundingClientRect();
   showCopyPop(rect.left + rect.width / 2, rect.top + rect.height / 2);
-}
-
-function copyIconButton(
-  label: string,
-  extraAttrs = "",
-): string {
-  return `<button type="button" class="copy-icon-btn" ${extraAttrs} aria-label="${escapeAttr(label)}" title="${escapeAttr(label)}">${COPY_ICON_SVG}</button>`;
 }
 
 function runSubmitCelebrate(btn: HTMLButtonElement) {
@@ -540,9 +532,9 @@ function renderQuote(q: Quote) {
       <div id="platform-packet" class="platform-packet"></div>
     </div>
 
-    <div class="brief" id="brief">${escapeHtml(q.listing_brief)}</div>
-    <div class="copy-row copy-row--icon">
-      ${copyIconButton("Copy price summary", 'id="copy-brief"')}
+    <div class="price-sheet-block">
+      <h3 class="price-sheet-heading">Price sheet</h3>
+      <p class="brief" id="brief">${escapeHtml(q.listing_brief)}</p>
     </div>
   `;
 
@@ -550,7 +542,6 @@ function renderQuote(q: Quote) {
   if (priceHost && setup.price_fields) {
     priceHost.innerHTML = `
       <div class="section-group">
-        <h4 class="section-group-title">Price on the site</h4>
         ${renderSections([setup.price_fields], "price")}
       </div>
     `;
@@ -564,7 +555,7 @@ function renderQuote(q: Quote) {
       btn.addEventListener("click", async (ev) => {
         const id = btn.getAttribute("data-copy-target");
         const el = id ? document.getElementById(id) : null;
-        if (el) await copyWithIcon(el.textContent ?? "", btn);
+        if (el) await copyFromButton(el.textContent ?? "", btn);
       });
     });
   }
@@ -582,15 +573,15 @@ function renderQuote(q: Quote) {
         <h4 class="section-group-title">${escapeHtml(packet.label)} listing copy</h4>
         ${platformHtml}
       </div>
-      <div class="copy-row copy-row--icon">
-        ${copyIconButton("Copy title and description", 'id="copy-essentials-btn" class="primary-copy"')}
+      <div class="copy-row">
+        <button type="button" class="ghost primary-copy" id="copy-essentials-btn">Copy title + description</button>
       </div>
     `;
 
     wireCopyButtons(host);
     host.querySelector("#copy-essentials-btn")?.addEventListener("click", async (ev) => {
       const btn = ev.currentTarget as HTMLButtonElement;
-      await copyWithIcon(packet.copy_essentials_text, btn);
+      await copyFromButton(packet.copy_essentials_text, btn);
     });
   }
 
@@ -611,8 +602,8 @@ function renderQuote(q: Quote) {
                 <div class="draft-box-wrap${f.multiline ? " scrollable" : ""}">
                   <div class="draft-box${f.multiline ? " multiline" : ""}" id="${fieldId}">${escapeHtml(f.value)}</div>
                 </div>
-                <div class="copy-row copy-row--icon">
-                  ${copyIconButton(`Copy ${f.label}`, `data-copy-target="${fieldId}"`)}
+                <div class="copy-row">
+                  <button type="button" class="ghost" data-copy-target="${fieldId}">Copy ${escapeHtml(f.label)}</button>
                 </div>
               </div>
             `;
@@ -644,10 +635,6 @@ function renderQuote(q: Quote) {
     });
   });
 
-  document.querySelector("#copy-brief")?.addEventListener("click", async (ev) => {
-    const btn = ev.currentTarget as HTMLButtonElement;
-    await copyWithIcon(q.listing_brief, btn);
-  });
 }
 
 function formatCompMeta(q: Quote): string {

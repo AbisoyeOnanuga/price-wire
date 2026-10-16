@@ -62,9 +62,9 @@ function essentialsText(title: string, description: string): string {
 function buildPriceFields(prediction: PricePrediction): ListingFormSection {
   return {
     id: "pricing",
-    title: "List price (main value prop)",
+    title: "Price sheet",
     description:
-      "Price Wire’s comp band for electronics in this condition. Paste into the marketplace price field—not into your description.",
+      "Your price band for this item in this condition. Paste into the marketplace price field—not into your description.",
     fields: [
       field("suggested_price", "Suggested", `$${prediction.suggested_price}`, {
         hint: "Starting ask from similar electronics sales in our sample pool",
