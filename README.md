@@ -1,12 +1,12 @@
 # Price Wire
 
-Open-source-AI pricing copilot for **electronics resellers**. Price Wire pools comparable sold and active listings so you can pick a competitive **initial list price** without guessing.
+Open-source-AI **maker desk** for people who sell handmade work, prints, custom orders, and physical SKUs. Price Wire pools comparable listings so you can pick a **starting price** and paste-ready copy without an hour of tab switching.
 
 Built for [Hacktoberfest Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12).
 
 ## Who pays for this?
 
-Part-time sellers on eBay, Facebook Marketplace, Amazon, and similar platforms who list phones, consoles, headphones, and other electronics. A fast comp-backed price band is worth a small monthly subscription if inference cost stays low.
+Hybrid makers and small creative shops on Etsy, markets, and social sales. When someone wants to buy your piece, a fast **price sheet** plus listing copy is worth a small monthly subscription if lookup cost stays low.
 
 ## Stack
 
@@ -32,7 +32,9 @@ npm run build
 npm run dev
 ```
 
-Open `http://localhost:8787` and try: `Sony WH-1000XM5 Wireless Headphones Black`.
+Open `http://localhost:8787` and try: `Hand thrown stoneware mug set of 2 matte glaze` (or any item title you plan to list).
+
+Strategic positioning: [hacktoberfest-week2/VIABILITY-STUDY.md](./hacktoberfest-week2/VIABILITY-STUDY.md).
 
 After pricing, use **Five-minute listing draft** to copy title, key item specifics, and condition-led description per platform. Price goes in the marketplace price field—not the description.
 

@@ -100,11 +100,11 @@ function coreCopySections(
       id: "listing_copy",
       title: "What to paste first",
       description:
-        "Electronics listings win on search title, honest condition copy, and a fair price. Marketplace category specifics (MPN, carrier, etc.) come later in each site’s form.",
+        "Listings win on a clear title, honest condition story, and a fair price. Tags, materials, and shipping come later in each site’s form.",
       fields: [
         field("title", "Title", title, {
           max_length: platformTitleLimit(platform),
-          hint: "Search-friendly: brand, model, storage, unlocked—check character limit for this site",
+          hint: "Search-friendly: what it is, size, material, or edition—check character limit",
         }),
         field("condition", "Condition", cond, {
           hint: "Pick the closest dropdown option on the marketplace",
@@ -117,13 +117,13 @@ function coreCopySections(
     },
     {
       id: "optional_specifics",
-      title: "Optional electronics specifics",
+      title: "Optional listing specifics",
       description:
         "Only if the form asks—skip blanks you do not need. Full category catalogs are out of scope for this prototype.",
       fields: [
         field("item_specifics", "Starter specifics", optionalSpecifics(draft), {
           multiline: true,
-          hint: "Edit or replace with what your category requires (phones vs consoles vs headphones)",
+          hint: "Edit for your medium (clay, paper size, wood dimensions, etc.)",
         }),
       ],
     },

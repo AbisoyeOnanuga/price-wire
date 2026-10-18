@@ -35,7 +35,19 @@ function benefitLine(specs: ExtractedSpecs): string {
   if (/macbook|laptop|thinkpad/i.test(hay)) {
     return "Portable power for school, work, or creative projects.";
   }
-  return "Honest listing with clear photos so you know exactly what you are getting.";
+  if (/mug|pottery|stoneware|ceramic|hand thrown/i.test(hay)) {
+    return "Handmade for daily use—buyers love seeing glaze and size in the photos.";
+  }
+  if (/print|giclée|giclee|edition|art print/i.test(hay)) {
+    return "Sized for easy framing—call out edition size so collectors know what they are getting.";
+  }
+  if (/sign|engrav|wood|cedar|custom/i.test(hay)) {
+    return "Made to order feel with clear dimensions—perfect for gifts and home curb appeal.";
+  }
+  if (/knit|crochet|embroid|jewelry|resin|leather|candle/i.test(hay)) {
+    return "Small-batch work with the detail shots buyers expect on Etsy and at markets.";
+  }
+  return "Clear photos and honest copy so buyers trust what they are ordering.";
 }
 
 /**

@@ -12,25 +12,25 @@ export type PlatformMeta = {
 
 export const PLATFORMS: PlatformMeta[] = [
   {
-    id: "ebay",
-    label: "eBay",
-    tagline: "Title and description first—eBay handles shipping in its own flow",
-    default: true,
-  },
-  {
     id: "etsy",
     label: "Etsy",
-    tagline: "Title and description; add Etsy-only fields only if you sell there",
-  },
-  {
-    id: "stockx",
-    label: "StockX",
-    tagline: "Match the catalog, then set ask price in StockX",
+    tagline: "Paste title and story-led description—tags and materials come next in Etsy’s form",
+    default: true,
   },
   {
     id: "facebook",
     label: "Facebook Marketplace",
-    tagline: "Title, condition, description—price and delivery in Meta’s UI",
+    tagline: "Title, condition, description—price and pickup in Meta’s UI",
+  },
+  {
+    id: "ebay",
+    label: "eBay",
+    tagline: "Title and description first—shipping and category specifics after paste",
+  },
+  {
+    id: "stockx",
+    label: "StockX",
+    tagline: "For resale SKUs with a catalog match—price on StockX after you paste copy",
   },
 ];
 

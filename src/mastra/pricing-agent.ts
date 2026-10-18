@@ -70,7 +70,7 @@ export const predictPriceTool = createTool({
 
 export const pricingAgent = new Agent({
   name: "price-wire-agent",
-  instructions: `You are Price Wire, a pricing copilot for electronics resellers.
+  instructions: `You are Price Wire, a pricing copilot for makers and small sellers (handmade goods, prints, custom orders, and resale SKUs).
 Call tools to extract listing specs, search pooled comps, optionally refresh live eBay comps, and predict a list price.`,
   model: "google/gemma-2-2b-it",
   tools: {

@@ -13,10 +13,10 @@ import {
 } from "../lib/embeddings.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SAMPLE_CSV = path.resolve(
-  __dirname,
-  "../../sample-data/electronics-comps.csv",
-);
+const SAMPLE_CSV_PATHS = [
+  path.resolve(__dirname, "../../sample-data/maker-comps.csv"),
+  path.resolve(__dirname, "../../sample-data/electronics-comps.csv"),
+];
 
 let pool: pg.Pool | null = null;
 let memoryComps: CompRow[] | null = null;
@@ -49,9 +49,10 @@ function parseCsvLine(line: string): string[] {
   return out;
 }
 
-export function loadSampleCompsFromCsv(): CompRow[] {
-  const raw = fs.readFileSync(SAMPLE_CSV, "utf8");
+function loadCsvFile(filePath: string): CompRow[] {
+  const raw = fs.readFileSync(filePath, "utf8");
   const lines = raw.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
   const header = parseCsvLine(lines[0]);
   const rows: CompRow[] = [];
   for (let i = 1; i < lines.length; i++) {
@@ -77,6 +78,15 @@ export function loadSampleCompsFromCsv(): CompRow[] {
         source: rec.source as CompRow["source"],
       }),
     );
+  }
+  return rows;
+}
+
+export function loadSampleCompsFromCsv(): CompRow[] {
+  const rows: CompRow[] = [];
+  for (const filePath of SAMPLE_CSV_PATHS) {
+    if (!fs.existsSync(filePath)) continue;
+    rows.push(...loadCsvFile(filePath));
   }
   return rows;
 }
