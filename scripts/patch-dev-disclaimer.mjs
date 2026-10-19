@@ -30,7 +30,7 @@ const newFooter = `---
 
 *Prototype disclaimer.* Hacktoberfest demo, not financial or legal advice. Verify fees, shipping, and marketplace rules before you list.
 
-*Post-deadline update (19 Oct 2026).* After the submission window, this article and the [repo README](https://github.com/AbisoyeOnanuga/price-wire#post-deadline-documentation-update-judging-period) were updated so copy matches what you can verify on the hosted demo. One **bug fix** restores the intended SerpApi path (live similar listings when keyed; repo examples only when live search is unavailable—not mixed into live quotes). Optional stack (Tiger, Mastra agent loop, deep Sentry) remains future work, not live-demo claims.
+*Post-deadline update (19 Oct 2026).* After the submission window, this article and the [judging disclaimer](https://github.com/AbisoyeOnanuga/price-wire/blob/main/JUDGING-DISCLAIMER.md) were updated so copy matches what you can verify on the hosted demo. One **bug fix** restores the intended SerpApi path (live similar listings when keyed; repo examples only when live search is unavailable—not mixed into live quotes). Optional stack (Tiger, Mastra agent loop, deep Sentry) remains future work, not live-demo claims.
 
 </small></p>`;
 
