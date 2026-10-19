@@ -11,6 +11,7 @@ console.log(
       suggested: quote.suggested_price,
       comps: quote.comp_count,
       method: quote.method,
+      stack_layers: quote.stack_layers,
       confidence: quote.confidence,
       top_comp: quote.comps[0]?.title,
       listing_platform: quote.listing_setup?.default_platform,

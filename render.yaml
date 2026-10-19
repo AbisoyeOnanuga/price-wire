@@ -18,6 +18,12 @@ services:
         sync: false
       - key: OLLAMA_BASE_URL
         sync: false
+      - key: OLLAMA_ENABLED
+        sync: false
+      - key: GEMMA_MODEL
+        sync: false
+      - key: OLLAMA_FIRST
+        sync: false
       - key: SENTRY_DSN
         sync: false
       - key: QUOTE_RATE_LIMIT

@@ -5,7 +5,9 @@
 1. Connect the GitHub repo and use [render.yaml](./render.yaml) at the repository root.
 2. Set secrets in the Render dashboard:
    - `DATABASE_URL` — Tiger Data Postgres connection string (enable pgvector; run `npm run seed` once via shell or CI).
-   - `GOOGLE_GENERATIVE_AI_API_KEY` or `OLLAMA_BASE_URL` — Gemma extraction.
+   - `GOOGLE_GENERATIVE_AI_API_KEY` — title parsing on Render (typical production path).
+   - `GOOGLE_GEMMA_MODEL` — optional; use `gemini-2.5-flash` if Gemma model ids return 404.
+   - **Ollama is local-only** on Render’s Node web service unless you host Ollama elsewhere: set `OLLAMA_ENABLED=true`, `OLLAMA_BASE_URL=https://your-ollama-host`, and `GEMMA_MODEL`. Otherwise rely on Google or tier-0 heuristics.
    - `TABPFN_API_KEY` — Prior Labs TabPFN predictions.
    - `SERPAPI_KEY` — live shopping + eBay comps (2 SerpApi calls per quote).
    - `QUOTE_RATE_LIMIT` — default `8` on Render (per IP per minute).

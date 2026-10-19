@@ -13,7 +13,7 @@ Price Wire runs as one Node app (`npm run dev` → `http://localhost:8787`). Int
 | **4 — ML price band** | TabPFN prediction instead of median | TabPFN API |
 | **5 — Production trace** | Sentry spans on `/api/quote` | Sentry DSN |
 
-Start at tier 0, then add keys one at a time and watch the status line on the form (**Gemma · TabPFN · Tiger · SerpApi**).
+Start at tier 0, then add keys one at a time and watch the status line on the form (**Listing AI · Price model · Sale prices · Online listings · Agent harness · Traces**).
 
 ---
 
@@ -28,6 +28,7 @@ Copy `.env.example` → `.env` in the repo root.
 | `GEMMA_MODEL` | Ollama | Pull model: `ollama pull gemma2:2b` | Model name for local Gemma |
 | `DATABASE_URL` | [Tiger Data](https://www.tigerdata.com/) (or any Postgres + pgvector) | Connection string from your DEV service | Comp store + hybrid search |
 | `SERPAPI_KEY` | [SerpApi](https://serpapi.com/) | Dashboard API key | Live marketplace search results |
+| `SERP_MIN_LOCAL_COMPS` | — | Default `4` | Skip Serp when CSV/Tiger already return ≥ this many comps (quota saver) |
 | `TABPFN_API_KEY` | [Prior Labs / TabPFN](https://www.priorlabs.ai/) | Platform API key | Tabular price prediction |
 | `SENTRY_DSN` | [Sentry](https://sentry.io/) | Project DSN | Optional tracing |
 | `PORT` | — | Default `8787` | HTTP port |
@@ -57,7 +58,7 @@ Open `http://localhost:8787`, enter a title and condition, submit.
 
 ### Tier 1 — Gemma (pick one)
 
-**Option A — Ollama (local, no Google key)**
+**Option A — Ollama (local, recommended for HF26 dev)**
 
 ```bash
 # Install Ollama, then:
@@ -71,7 +72,7 @@ OLLAMA_BASE_URL=http://127.0.0.1:11434
 GEMMA_MODEL=gemma2:2b
 ```
 
-Leave `GOOGLE_GENERATIVE_AI_API_KEY` empty. Restart `npm run dev`. Health should show **Gemma** on.
+Leave `GOOGLE_GENERATIVE_AI_API_KEY` empty (dev defaults to **Ollama-first** when the Google key is absent). Restart `npm run dev`. Verbose health (`/api/health?verbose=1`) should show `ollama_live: true` and quotes should report `extraction: ollama_gemma`.
 
 **Option B — Google AI**
 
@@ -79,7 +80,9 @@ Leave `GOOGLE_GENERATIVE_AI_API_KEY` empty. Restart `npm run dev`. Health should
 GOOGLE_GENERATIVE_AI_API_KEY=your_key
 ```
 
-Restart dev server. Cloud Gemma is used when the key is set (see `extract-specs.ts` for precedence).
+Restart dev server. Google runs first unless you set `OLLAMA_FIRST=true` or `OLLAMA_ENABLED=true` (then local Ollama is tried before Google).
+
+**When Google models 404** (common with Gemma id mismatches): leave the key set—extraction **falls back to Ollama** when it is running, then heuristics. For Ollama before every quote, add `OLLAMA_FIRST=true`.
 
 ### Tier 2 — Tiger / Postgres
 
