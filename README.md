@@ -1,5 +1,7 @@
 # Price Wire
 
+> Post-deadline, docs were clarified for judging readers: [hacktoberfest-week2/JUDGING-DISCLAIMER.md](./hacktoberfest-week2/JUDGING-DISCLAIMER.md). No change to demo behavior.
+
 **Live-seller prep notebook:** before a **live marketplace stream** (eBay Live, TikTok Shop LIVE, and similar) or a new listing, get a **price sheet** and **paste-ready copy** in one pass. Price Wire pulls **live similar listings** when SerpApi is configured, falls back to **bundled examples**, and uses **AI title parsing** (or simple rules) so you spend less time tab switching.
 
 Built for [Hacktoberfest Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12).

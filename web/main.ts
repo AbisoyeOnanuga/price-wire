@@ -430,16 +430,6 @@ async function loadHealth() {
         h.serpapi ? "on" : "off",
         h.serpapi ? "online" : "offline",
       ),
-      serviceChip(
-        "Pricing tools",
-        h.mastra === false ? "off" : "on",
-        h.mastra === false ? "offline" : "ready",
-      ),
-      serviceChip(
-        "Error tracking",
-        h.sentry ? "on" : "off",
-        h.sentry ? "on" : "local only",
-      ),
     ].join("");
   } catch {
     statusLine.innerHTML =

@@ -1,24 +1,30 @@
-# Stack layers (technical map)
+# Stack map (technical)
 
-**Story for readers:** [README.md](./README.md) and [hacktoberfest-week2/FUTURE.md](./hacktoberfest-week2/FUTURE.md) (what ships vs what is wired for later).
+**Reader story:** [README.md](./README.md) · **shipped vs later:** [hacktoberfest-week2/FUTURE.md](./hacktoberfest-week2/FUTURE.md)
 
-Price Wire is one Node process (`src/server.ts`) and a Vite UI (`web/`). Each `/api/quote` runs `runPricingPipeline` in `src/mastra/pricing-agent.ts` (deterministic steps; Mastra registers tools but does not run an agent loop on HTTP).
+One Node process (`src/server.ts`) + Vite UI. `/api/quote` runs `runPricingPipeline` in `src/mastra/pricing-agent.ts` (deterministic steps).
 
-| Layer | Partner / tech | Key files | Offline fallback |
+## In the demo story today
+
+| Layer | Tech | Files | Fallback |
 | --- | --- | --- | --- |
-| **Extraction** | Gemma (Google AI or Ollama) | `src/tools/extract-specs.ts` | Heuristic title parsing |
-| **Comp store** | Tiger / Postgres + pgvector | `src/tools/comp-store.ts`, `sql/schema.sql`, `npm run db:schema` / `npm run seed` | `sample-data/*.csv` in memory |
-| **Live market** | SerpApi | `src/tools/serp-comps.ts` | Skipped when `SERPAPI_KEY` unset; errors logged, pipeline continues |
-| **Pricing** | TabPFN (Prior Labs) | `src/tools/tabpfn-price.ts` | Median + spread confidence |
-| **Harness** | Mastra | `src/mastra/pricing-agent.ts` | Always loaded (`mastra: true` on `/api/health?verbose=1`) |
-| **Host** | Render | `render.yaml`, `DEPLOY.md` | `npm run dev` locally |
-| **Traces** | Sentry | `src/lib/sentry.ts` | No-op when `SENTRY_DSN` unset |
-| **UI** | Listing copy + marketplace packets | `web/main.ts`, `src/lib/sell-copy.ts`, `src/tools/listing-packets.ts` | Static form + results notebook |
+| **Live similar sales** | SerpApi | `src/tools/serp-comps.ts` | Bundled CSV examples |
+| **Title → search query** | Gemma / Gemini / Ollama | `src/tools/extract-specs.ts` | Title rules |
+| **Price band** | Median (+ optional TabPFN) | `src/tools/tabpfn-price.ts` | Median always available |
+| **Listing copy** | Templates | `src/lib/sell-copy.ts`, `listing-packets.ts` | — |
+| **Host** | Render | `render.yaml` | `npm run dev` |
+
+## Wired for later (see FUTURE.md)
+
+| Layer | Tech | Notes |
+| --- | --- | --- |
+| **Saved sales DB** | Tiger / pgvector | `comp-store.ts`, `sql/schema.sql` |
+| **Agent harness** | Mastra | Tools registered; HTTP does not run an agent loop |
+| **Traces** | Sentry | `pricing.run` when DSN set |
 
 ## Observability
 
-- **Form status chips** — `GET /api/health?verbose=1` → Listing AI, Price model, Sale prices, Online listings, Agent harness, Traces.
-- **Quote response** — `stack_layers` object (extraction method, comp sources, pricing method, harness id). Shown in the results meta line after each quote.
-- **Smoke** — `npm run smoke` exercises the full pipeline without HTTP.
+- **Chips:** Listing AI, Price model, Saved sales (optional DB), Online listings.
+- **`stack_layers`** on quote JSON (for developers).
 
-Full env tiers: [SETUP.md](./SETUP.md). Redundancy / prizes: [hacktoberfest-week2/STACK-AUDIT.md](./hacktoberfest-week2/STACK-AUDIT.md). Product picture: [hacktoberfest-week2/PRODUCT-PICTURE.md](./hacktoberfest-week2/PRODUCT-PICTURE.md) · checklist: [PRODUCT-BRIEF.md](./hacktoberfest-week2/PRODUCT-BRIEF.md).
+Env tiers: [SETUP.md](./SETUP.md). HF26 submission-era audit (archival): [hacktoberfest-week2/STACK-AUDIT.md](./hacktoberfest-week2/STACK-AUDIT.md).
