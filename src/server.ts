@@ -11,6 +11,7 @@ import {
   integrationFlags,
   isDatabaseLive,
   isGemmaConfigured,
+  isOllamaReachable,
 } from "./lib/integration-health.js";
 import { checkRateLimit } from "./lib/rate-limit.js";
 import {
@@ -126,6 +127,8 @@ app.get("/api/health", async (c) => {
   }
   const flags = integrationFlags();
   const gemma = await isGemmaConfigured();
+  const ollama_live =
+    flags.ollama_enabled ? await isOllamaReachable() : false;
   const database_live = flags.database ? await isDatabaseLive() : false;
   return c.json({
     ok: true,
@@ -137,7 +140,10 @@ app.get("/api/health", async (c) => {
     gemma,
     google_gemma: flags.google_gemma,
     ollama_enabled: flags.ollama_enabled,
+    ollama_first: flags.ollama_first,
+    ollama_live,
     mastra: true,
+    sentry: Boolean(config.sentryDsn),
   });
 });
 

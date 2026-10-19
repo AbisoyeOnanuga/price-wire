@@ -29,6 +29,14 @@ export const config = {
   ollamaEnabled:
     env("OLLAMA_ENABLED") === "true" ||
     nodeEnv !== "production",
+  /**
+   * Try local Ollama before Google cloud extraction.
+   * On when OLLAMA_FIRST=true, OLLAMA_ENABLED=true, or no Google key in dev (Ollama when reachable).
+   */
+  ollamaFirst:
+    env("OLLAMA_FIRST") === "true" ||
+    env("OLLAMA_ENABLED") === "true" ||
+    (nodeEnv !== "production" && !env("GOOGLE_GENERATIVE_AI_API_KEY")),
   allowedOrigins: parseOrigins(env("ALLOWED_ORIGINS")),
   quoteApiKey: env("QUOTE_API_KEY"),
   quoteRateLimit: Number(env("QUOTE_RATE_LIMIT", "30")),

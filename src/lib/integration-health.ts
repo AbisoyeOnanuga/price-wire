@@ -5,11 +5,10 @@ let ollamaReachable: boolean | null = null;
 let ollamaCheckedAt = 0;
 const OLLAMA_CACHE_MS = 60_000;
 
-export async function isGemmaConfigured(): Promise<boolean> {
-  if (config.googleApiKey) {
-    return true;
-  }
+async function refreshOllamaReachable(): Promise<boolean> {
   if (!config.ollamaEnabled) {
+    ollamaReachable = false;
+    ollamaCheckedAt = Date.now();
     return false;
   }
   const now = Date.now();
@@ -28,6 +27,21 @@ export async function isGemmaConfigured(): Promise<boolean> {
   return ollamaReachable;
 }
 
+/** True when Ollama is enabled and responds on /api/tags. */
+export async function isOllamaReachable(): Promise<boolean> {
+  return refreshOllamaReachable();
+}
+
+export async function isGemmaConfigured(): Promise<boolean> {
+  if (config.googleApiKey) {
+    return true;
+  }
+  if (!config.ollamaEnabled) {
+    return false;
+  }
+  return refreshOllamaReachable();
+}
+
 export function integrationFlags() {
   return {
     database: Boolean(config.databaseUrl),
@@ -35,6 +49,9 @@ export function integrationFlags() {
     tabpfn: Boolean(config.tabpfnApiKey),
     google_gemma: Boolean(config.googleApiKey),
     ollama_enabled: config.ollamaEnabled,
+    ollama_first: config.ollamaFirst,
+    sentry: Boolean(config.sentryDsn),
+    mastra: true,
   };
 }
 

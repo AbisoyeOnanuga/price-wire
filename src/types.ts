@@ -93,6 +93,21 @@ export const ListingDraftSchema = z.object({
   condition_marketing_tip: z.string(),
 });
 
+export const StackLayersSchema = z.object({
+  extraction: z.enum(["google_gemma", "ollama_gemma", "heuristic"]),
+  comps: z.object({
+    seed: z.number(),
+    tiger: z.number(),
+    serpapi: z.number(),
+    serpapi_configured: z.boolean(),
+    serpapi_error: z.boolean(),
+    serpapi_skipped_local: z.boolean().optional(),
+  }),
+  pricing: z.enum(["tabpfn", "median_fallback"]),
+  harness: z.literal("mastra"),
+});
+export type StackLayers = z.infer<typeof StackLayersSchema>;
+
 export const PriceQuoteSchema = z.object({
   suggested_price: z.number(),
   quick_sale_price: z.number(),
@@ -102,6 +117,7 @@ export const PriceQuoteSchema = z.object({
   comp_count: z.number(),
   method: z.enum(["tabpfn", "median_fallback"]),
   method_label: z.string(),
+  stack_layers: StackLayersSchema,
   comps: z.array(CompRowSchema),
   specs: ExtractedSpecsSchema,
   listing_brief: z.string(),

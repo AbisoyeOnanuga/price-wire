@@ -3,7 +3,7 @@ import { Agent } from "@mastra/core/agent";
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { searchComps, upsertSerpComps } from "../tools/comp-store.js";
-import { extractSpecs } from "../tools/extract-specs.js";
+import { extractSpecs, extractSpecsWithMeta } from "../tools/extract-specs.js";
 import { fetchSerpComps } from "../tools/serp-comps.js";
 import { confidenceLabel, pricingMethodLabel, resolveMarketplaceCondition } from "../lib/conditions.js";
 import {
@@ -95,17 +95,29 @@ export async function runPricingPipeline(
   conditionDetail?: string,
 ): Promise<PriceQuote> {
   const marketplace = resolveMarketplaceCondition(conditionHint);
-  const specs = await extractSpecs(title, marketplace.pricing_grade);
+  const { specs, method: extractionMethod } = await extractSpecsWithMeta(
+    title,
+    marketplace.pricing_grade,
+  );
 
   const libraryComps = await searchComps(specs, 5);
   let serp: Awaited<ReturnType<typeof fetchSerpComps>> = [];
-  if (config.serpApiKey) {
+  let serpapiError = false;
+  let serpapiSkippedLocal = false;
+  const shouldFetchSerp =
+    Boolean(config.serpApiKey) &&
+    libraryComps.length < config.serpMinLocalComps;
+  if (config.serpApiKey && !shouldFetchSerp) {
+    serpapiSkippedLocal = true;
+  }
+  if (shouldFetchSerp) {
     try {
       serp = await fetchSerpComps(specs, 10, title);
       if (serp.length) {
         await upsertSerpComps(serp);
       }
     } catch (err) {
+      serpapiError = true;
       console.warn("SerpApi fetch failed, continuing with library sales:", err);
     }
   }
@@ -137,6 +149,9 @@ export async function runPricingPipeline(
     marketplace.value,
   );
 
+  const stackComps = compsOut.length ? compsOut : libraryComps;
+  const serpCount = stackComps.filter((c) => c.source === "serpapi").length;
+
   return PriceQuoteSchema.parse({
     suggested_price: prediction.suggested_price,
     quick_sale_price: prediction.quick_sale_price,
@@ -146,8 +161,21 @@ export async function runPricingPipeline(
     comp_count: compsOut.length || libraryComps.length,
     method: prediction.method,
     method_label: pricingMethodLabel(prediction.method, {
-      serpCount: compsOut.filter((c) => c.source === "serpapi").length,
+      serpCount,
     }),
+    stack_layers: {
+      extraction: extractionMethod,
+      comps: {
+        seed: stackComps.filter((c) => c.source === "seed").length,
+        tiger: stackComps.filter((c) => c.source === "tiger").length,
+        serpapi: serpCount,
+        serpapi_configured: Boolean(config.serpApiKey),
+        serpapi_error: serpapiError,
+        serpapi_skipped_local: serpapiSkippedLocal,
+      },
+      pricing: prediction.method,
+      harness: "mastra",
+    },
     comps: compsOut,
     specs,
     listing_brief,
