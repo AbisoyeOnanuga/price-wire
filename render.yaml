@@ -30,6 +30,4 @@ services:
         value: "8"
       - key: QUOTE_DAILY_CAP
         value: "30"
-      # Library search returns at most 5 rows; 6 = always fetch live listings when SERPAPI_KEY is set
-      - key: SERP_MIN_LOCAL_COMPS
-        value: "6"
+      # Do not set SERP_MIN_LOCAL_COMPS=4 on Render — older builds skipped live Serp when CSV matched.

@@ -103,14 +103,8 @@ export async function runPricingPipeline(
   const libraryComps = await searchComps(specs, 5);
   let serp: Awaited<ReturnType<typeof fetchSerpComps>> = [];
   let serpapiError = false;
-  let serpapiSkippedLocal = false;
-  const shouldFetchSerp =
-    Boolean(config.serpApiKey) &&
-    libraryComps.length < config.serpMinLocalComps;
-  if (config.serpApiKey && !shouldFetchSerp) {
-    serpapiSkippedLocal = true;
-  }
-  if (shouldFetchSerp) {
+  const serpapiSkippedLocal = false;
+  if (config.serpApiKey) {
     try {
       serp = await fetchSerpComps(specs, 10, title);
       if (serp.length) {

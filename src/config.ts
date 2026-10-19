@@ -42,7 +42,10 @@ export const config = {
   quoteRateLimit: Number(env("QUOTE_RATE_LIMIT", "30")),
   /** Global cap on /api/quote per UTC day (0 = unlimited). Protects SerpApi quota on public demos. */
   quoteDailyCap: Number(env("QUOTE_DAILY_CAP", "0")),
-  /** 6 = always call Serp when keyed (library search returns at most 5). */
+  /**
+   * Legacy: was used to skip Serp when enough CSV rows matched. Ignored when Serp key is set
+   * (live search always runs). Kept for env compatibility only.
+   */
   serpMinLocalComps: Number(env("SERP_MIN_LOCAL_COMPS", "6")),
   /**
    * Set true for Tiger/managed Postgres when Node reports SELF_SIGNED_CERT_IN_CHAIN.

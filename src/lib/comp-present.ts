@@ -28,37 +28,35 @@ function dedupeByTitle(rows: CompRow[]): CompRow[] {
   return out;
 }
 
-/** Live listings first; at most five practice / saved rows. */
+/** Live listings when present; bundled examples only if live search returned nothing. */
 export function mergeCompsForDisplay(
   live: CompRow[],
   library: CompRow[],
 ): CompRow[] {
-  const out: CompRow[] = [];
-  for (const c of dedupeByTitle(live)) {
-    out.push(c);
+  const liveDeduped = dedupeByTitle(live);
+  if (liveDeduped.length > 0) {
+    return liveDeduped;
   }
-  const maxLibrary =
-    out.length > 0
-      ? Math.min(2, MAX_LIBRARY_COMPS_SHOWN)
-      : MAX_LIBRARY_COMPS_SHOWN;
 
+  const out: CompRow[] = [];
   let libraryShown = 0;
   for (const c of dedupeByTitle(library)) {
-    if (libraryShown >= maxLibrary) break;
-    if (out.some((r) => r.title.toLowerCase() === c.title.toLowerCase())) {
-      continue;
-    }
+    if (libraryShown >= MAX_LIBRARY_COMPS_SHOWN) break;
     out.push(c);
     libraryShown++;
   }
   return out;
 }
 
-/** For pricing math: live first, then library, capped. */
+/** Pricing uses live rows only when Serp returned data; else library fallback. */
 export function mergeCompsForPricing(
   live: CompRow[],
   library: CompRow[],
   cap = 15,
 ): CompRow[] {
-  return dedupeByTitle([...live, ...library]).slice(0, cap);
+  const liveDeduped = dedupeByTitle(live);
+  if (liveDeduped.length > 0) {
+    return liveDeduped.slice(0, cap);
+  }
+  return dedupeByTitle(library).slice(0, cap);
 }
