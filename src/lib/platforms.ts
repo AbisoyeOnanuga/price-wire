@@ -14,23 +14,23 @@ export const PLATFORMS: PlatformMeta[] = [
   {
     id: "etsy",
     label: "Etsy",
-    tagline: "Paste title and story-led description—tags and materials come next in Etsy’s form",
+    tagline: "Paste title and story-led description. Tags and materials come next in Etsy’s form",
     default: true,
   },
   {
     id: "facebook",
     label: "Facebook Marketplace",
-    tagline: "Title, condition, description—price and pickup in Meta’s UI",
+    tagline: "Title, condition, description. Price and pickup stay in Meta’s UI",
   },
   {
     id: "ebay",
     label: "eBay",
-    tagline: "Title and description first—shipping and category specifics after paste",
+    tagline: "Title and description first. Shipping and category specifics after paste",
   },
   {
     id: "stockx",
     label: "StockX",
-    tagline: "For resale SKUs with a catalog match—price on StockX after you paste copy",
+    tagline: "For resale SKUs with a catalog match. Set price on StockX after you paste copy",
   },
 ];
 

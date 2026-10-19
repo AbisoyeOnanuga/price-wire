@@ -1,69 +1,50 @@
 # Price Wire
 
-Open-source-AI **maker desk** for people who sell handmade work, prints, custom orders, and physical SKUs—**before a live sale or a new listing**. Price Wire pools comparable listings so you can pick a **starting price** and paste-ready copy without an hour of tab switching.
+**Live-seller prep notebook:** before a **live marketplace stream** (eBay Live, TikTok Shop LIVE, and similar) or a new listing, get a **price sheet** and **paste-ready copy** in one pass. Price Wire pulls **live similar listings** when SerpApi is configured, falls back to **bundled examples**, and uses **AI title parsing** (or simple rules) so you spend less time tab switching.
 
 Built for [Hacktoberfest Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12).
 
-## Who pays for this?
+## Who is this for?
 
-Hybrid makers and small creative shops on Etsy, markets, and social sales. When someone wants to buy your piece, a fast **price sheet** plus listing copy is worth a small monthly subscription if lookup cost stays low.
+People who sell on camera or in marketplace forms: handmade work, prints, resale, and small-shop inventory. The problem is the **minutes before you go live** or list: picking a floor price and words that match what buyers see **this week**.
 
-## Stack
+## What ships in this prototype
 
-| Layer | Technology |
+| Piece | Role |
 | --- | --- |
-| Open brain | Gemma (Google AI or Ollama `gemma2`) — **title → specs**; listing copy is templates |
-| Tabular model | TabPFN (Prior Labs API) |
-| Live comps | SerpApi (eBay engine) |
-| Comp store | Tiger Data / Postgres + pgvector |
-| Agent harness | Mastra tool registration (`runPricingPipeline` is deterministic) |
-| Hosting | Render (`render.yaml`) |
-| Observability | Sentry (optional) |
-| Session transcript (DEV) | DevRelay agent session — see `hacktoberfest-week2/DEVRELAY-SESSION.md` |
+| **SerpApi** | Live shopping / marketplace-style similar listings (primary signal when keyed) |
+| **Gemma / Gemini / Ollama** | Optional **AI title parsing** → search query (not listing prose) |
+| **Title rules** | Fallback when no model is reachable |
+| **Median + confidence** | Default price band from similar sales |
+| **TabPFN** | Optional; only when API key works |
+| **Templates** | Etsy/eBay/Facebook paste blocks + price sheet |
+| **Render** | Hosted demo (`render.yaml`) |
+| **Bundled CSV examples** | Keeps the app usable without any keys |
+
+Repo wiring for **Tiger** (saved sales), **Mastra** (agent harness), and **Sentry** (tracing) exists for later; they are **not** required for the story the public demo tells today. See [hacktoberfest-week2/FUTURE.md](./hacktoberfest-week2/FUTURE.md).
 
 ## Quick start
 
 ```bash
-cd price-wire
 cp .env.example .env
 npm install
-npm run seed    # loads sample CSV; uses Tiger when DATABASE_URL is set
 npm run build
 npm run dev
 ```
 
-Open `http://localhost:8787` and try: `Hand thrown stoneware mug set of 2 matte glaze` (or any item title you plan to list).
+Open `http://localhost:8787`. Try: `Hand thrown stoneware mug set of 2 matte glaze` or any title you plan to list.
 
-Strategic positioning: [hacktoberfest-week2/VIABILITY-STUDY.md](./hacktoberfest-week2/VIABILITY-STUDY.md).
+Optional: `npm run seed` when `DATABASE_URL` is set (Tiger/pgvector). `npm run smoke` for a headless pipeline check.
 
-After pricing, use **Five-minute listing draft** to copy title, key item specifics, and condition-led description per platform. Price goes in the marketplace price field—not the description.
+Full integration tiers: [SETUP.md](./SETUP.md).
 
-Full integration guide: [SETUP.md](./SETUP.md).
+## DEV write-up
 
-Smoke test without the server:
-
-```bash
-npm run smoke
-```
-
-## Environment
-
-See [.env.example](./.env.example). The app runs offline with **seed comps** and heuristic Gemma extraction when API keys are missing.
-
-Judge-facing: [STACK-LAYERS.md](./STACK-LAYERS.md) · [PRODUCT-PICTURE.md](./hacktoberfest-week2/PRODUCT-PICTURE.md) · [STACK-AUDIT.md](./hacktoberfest-week2/STACK-AUDIT.md).
-
-## Data ethics
-
-- Comps come from **seed sample data**, **SerpApi** (licensed search), and optional **user CSV imports** (roadmap).
-- Do **not** scrape marketplaces with personal credentials or bypass platform terms.
-- Do not paste buyer names, addresses, or other PII into listings or uploads.
+https://dev.to/abisoye/price-wire-price-your-used-electronics-and-paste-a-listing-in-minutes-hf26-week-2-3fii
 
 ## Deploy (Render)
 
-1. Create a Web Service from this repo root (see [render.yaml](./render.yaml)).
-2. Build: `npm install && npm run build`
-3. Start: `npm run start`
-4. Set env vars from `.env.example` (at minimum `DATABASE_URL` for Tiger, optional API keys).
+See [DEPLOY.md](./DEPLOY.md) and [hacktoberfest-week2/RENDER-FINISH.md](./hacktoberfest-week2/RENDER-FINISH.md).
 
 ## License
 

@@ -42,7 +42,8 @@ export const config = {
   quoteRateLimit: Number(env("QUOTE_RATE_LIMIT", "30")),
   /** Global cap on /api/quote per UTC day (0 = unlimited). Protects SerpApi quota on public demos. */
   quoteDailyCap: Number(env("QUOTE_DAILY_CAP", "0")),
-  serpMinLocalComps: Number(env("SERP_MIN_LOCAL_COMPS", "4")),
+  /** 6 = always call Serp when keyed (library search returns at most 5). */
+  serpMinLocalComps: Number(env("SERP_MIN_LOCAL_COMPS", "6")),
   /**
    * Set true for Tiger/managed Postgres when Node reports SELF_SIGNED_CERT_IN_CHAIN.
    * In development, auto-enabled when DATABASE_URL uses sslmode=require (override with DATABASE_SSL_INSECURE=false).

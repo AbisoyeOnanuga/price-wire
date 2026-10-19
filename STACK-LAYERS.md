@@ -1,6 +1,8 @@
-# Stack layers (HF26 judges)
+# Stack layers (technical map)
 
-Price Wire is one Node process (`src/server.ts`) and a Vite UI (`web/`). Each `/api/quote` runs `runPricingPipeline` in `src/mastra/pricing-agent.ts` — Mastra registers the tools; the HTTP path is deterministic (no separate Mastra server).
+**Story for readers:** [README.md](./README.md) and [hacktoberfest-week2/FUTURE.md](./hacktoberfest-week2/FUTURE.md) (what ships vs what is wired for later).
+
+Price Wire is one Node process (`src/server.ts`) and a Vite UI (`web/`). Each `/api/quote` runs `runPricingPipeline` in `src/mastra/pricing-agent.ts` (deterministic steps; Mastra registers tools but does not run an agent loop on HTTP).
 
 | Layer | Partner / tech | Key files | Offline fallback |
 | --- | --- | --- | --- |

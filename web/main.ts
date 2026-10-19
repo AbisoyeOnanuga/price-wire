@@ -554,7 +554,7 @@ function renderQuote(q: Quote) {
     <div class="draft-block listing-setup">
       <h3>Five-minute listing draft</h3>
       <p class="field-hint">${escapeHtml(q.listing_draft.condition_marketing_tip)}</p>
-      <p class="setup-lede">Prototype focus: <strong>price sheet</strong> and <strong>paste-ready copy</strong> for makers—handmade goods, prints, custom orders, and things you make or sell. Add category specifics only where the marketplace asks.</p>
+      <p class="setup-lede">Prototype focus: <strong>price sheet</strong> and <strong>paste-ready copy</strong> for makers: handmade goods, prints, custom orders, and things you make or sell. Add category specifics only where the marketplace asks.</p>
       <div id="price-fields" class="price-fields-copy"></div>
       <div class="platform-tabs" role="tablist" aria-label="Marketplace">${platformTabs}</div>
       <div id="platform-packet" class="platform-packet"></div>
