@@ -923,6 +923,12 @@ button:disabled {
   background: var(--surface-featured);
 }
 
+.table-caption {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
 .meta-row {
   font-size: 0.88rem;
   color: var(--muted);

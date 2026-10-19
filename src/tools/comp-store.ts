@@ -4,7 +4,11 @@ import { fileURLToPath } from "node:url";
 import type pg from "pg";
 import { config, hasDatabase } from "../config.js";
 import { createPgPool } from "../lib/pg-pool.js";
-import type { CompRow, ExtractedSpecs } from "../types.js";
+import type {
+  CompRow,
+  ConditionGrade as ConditionGradeType,
+  ExtractedSpecs,
+} from "../types.js";
 import { CompRowSchema, ConditionGrade } from "../types.js";
 import {
   cosineSimilarity,
@@ -26,6 +30,14 @@ function getPool(): pg.Pool {
     pool = createPgPool();
   }
   return pool;
+}
+
+/** Map marketplace CSV labels to pricing-grade enum used in comps. */
+function parseConditionGrade(raw: string): ConditionGradeType {
+  const s = raw.toLowerCase().trim();
+  if (s === "used" || s === "open_box" || s === "refurbished") return "good";
+  if (s === "for_parts") return "poor";
+  return ConditionGrade.parse(s);
 }
 
 function parseCsvLine(line: string): string[] {
@@ -69,7 +81,7 @@ function loadCsvFile(filePath: string): CompRow[] {
         model_family: rec.model_family,
         storage_gb: rec.storage_gb ? Number(rec.storage_gb) : null,
         carrier_lock: rec.carrier_lock,
-        condition_grade: ConditionGrade.parse(rec.condition_grade),
+        condition_grade: parseConditionGrade(rec.condition_grade),
         includes_charger: rec.includes_charger === "true",
         platform: rec.platform,
         listed_price: rec.listed_price ? Number(rec.listed_price) : null,

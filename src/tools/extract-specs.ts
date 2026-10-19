@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { config } from "../config.js";
+import { isOllamaReachable } from "../lib/integration-health.js";
 import { enrichSpecsFromTitle, inferBrandFromTitle, inferModelFromTitle } from "../lib/product-identity.js";
 import {
   ConditionGrade,
@@ -112,10 +113,11 @@ const GEMINI_EXTRACT_MODELS = [
 function googleExtractModelChain(): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
+  // Try Gemini fallbacks before additional Gemma ids — many Gemma-3 ids 404 on AI Studio.
   for (const m of [
     config.googleGemmaModel,
-    ...GEMMA_EXTRACT_MODELS,
     ...GEMINI_EXTRACT_MODELS,
+    ...GEMMA_EXTRACT_MODELS,
   ]) {
     if (!m || seen.has(m)) continue;
     seen.add(m);
@@ -148,24 +150,71 @@ async function extractWithGoogle(title: string, conditionHint?: string): Promise
   throw lastErr;
 }
 
+export type ExtractionMethod = "google_gemma" | "ollama_gemma" | "heuristic";
+
+async function tryOllamaExtract(
+  title: string,
+  conditionHint?: string,
+): Promise<{ specs: ExtractedSpecs; method: "ollama_gemma" } | null> {
+  if (!config.ollamaEnabled || !(await isOllamaReachable())) {
+    return null;
+  }
+  try {
+    return {
+      specs: await extractWithOllama(title, conditionHint),
+      method: "ollama_gemma",
+    };
+  } catch (err) {
+    console.warn("Ollama Gemma extraction failed:", err);
+    return null;
+  }
+}
+
+async function tryGoogleExtract(
+  title: string,
+  conditionHint?: string,
+): Promise<{ specs: ExtractedSpecs; method: "google_gemma" } | null> {
+  if (!config.googleApiKey) {
+    return null;
+  }
+  try {
+    return {
+      specs: await extractWithGoogle(title, conditionHint),
+      method: "google_gemma",
+    };
+  } catch (err) {
+    console.warn("Google Gemma/Gemini extraction failed (404 or parse error):", err);
+    return null;
+  }
+}
+
+export async function extractSpecsWithMeta(
+  title: string,
+  conditionHint?: string,
+): Promise<{ specs: ExtractedSpecs; method: ExtractionMethod }> {
+  const order: Array<"ollama" | "google"> = config.ollamaFirst
+    ? ["ollama", "google"]
+    : ["google", "ollama"];
+
+  for (const step of order) {
+    const result =
+      step === "ollama"
+        ? await tryOllamaExtract(title, conditionHint)
+        : await tryGoogleExtract(title, conditionHint);
+    if (result) {
+      return result;
+    }
+  }
+
+  return {
+    specs: heuristicExtract(title, conditionHint),
+    method: "heuristic",
+  };
+}
+
 export async function extractSpecs(
   title: string,
   conditionHint?: string,
 ): Promise<ExtractedSpecs> {
-  try {
-    if (config.googleApiKey) {
-      return await extractWithGoogle(title, conditionHint);
-    }
-    if (config.ollamaEnabled) {
-      const ollamaHealth = await fetch(`${config.ollamaBaseUrl}/api/tags`, {
-        signal: AbortSignal.timeout(2500),
-      }).catch(() => null);
-      if (ollamaHealth?.ok) {
-        return await extractWithOllama(title, conditionHint);
-      }
-    }
-  } catch (err) {
-    console.warn("Gemma extraction failed, using heuristic:", err);
-  }
-  return heuristicExtract(title, conditionHint);
+  return (await extractSpecsWithMeta(title, conditionHint)).specs;
 }

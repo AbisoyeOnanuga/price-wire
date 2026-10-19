@@ -52,6 +52,20 @@ type ListingDraft = {
   condition_marketing_tip: string;
 };
 
+type StackLayers = {
+  extraction: "google_gemma" | "ollama_gemma" | "heuristic";
+  comps: {
+    seed: number;
+    tiger: number;
+    serpapi: number;
+    serpapi_configured: boolean;
+    serpapi_error: boolean;
+    serpapi_skipped_local?: boolean;
+  };
+  pricing: "tabpfn" | "median_fallback";
+  harness: "mastra";
+};
+
 type Quote = {
   suggested_price: number;
   quick_sale_price: number;
@@ -60,6 +74,7 @@ type Quote = {
   confidence_label: string;
   comp_count: number;
   method_label: string;
+  stack_layers?: StackLayers;
   listing_brief: string;
   listing_draft: ListingDraft;
   listing_setup: ListingSetup;
@@ -81,6 +96,8 @@ type Health = {
   serpapi: boolean;
   tabpfn: boolean;
   gemma: boolean;
+  mastra?: boolean;
+  sentry?: boolean;
 };
 
 type ConditionOption = {
@@ -413,6 +430,16 @@ async function loadHealth() {
         h.serpapi ? "on" : "off",
         h.serpapi ? "online" : "offline",
       ),
+      serviceChip(
+        "Pricing tools",
+        h.mastra === false ? "off" : "on",
+        h.mastra === false ? "offline" : "ready",
+      ),
+      serviceChip(
+        "Error tracking",
+        h.sentry ? "on" : "off",
+        h.sentry ? "on" : "local only",
+      ),
     ].join("");
   } catch {
     statusLine.innerHTML =
@@ -517,8 +544,9 @@ function renderQuote(q: Quote) {
     </div>
     <p class="meta-row">${formatCompMeta(q)}</p>
     <div class="table-wrap">
+      <p class="table-caption">Similar sales we used for this estimate.</p>
       <table>
-        <thead><tr><th>Listing</th><th>Where</th><th>Price</th><th>Source</th></tr></thead>
+        <thead><tr><th>Listing</th><th>Where</th><th>Price</th><th>Found via</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -526,7 +554,7 @@ function renderQuote(q: Quote) {
     <div class="draft-block listing-setup">
       <h3>Five-minute listing draft</h3>
       <p class="field-hint">${escapeHtml(q.listing_draft.condition_marketing_tip)}</p>
-      <p class="setup-lede">Prototype focus: <strong>price sheet</strong> and <strong>paste-ready copy</strong> for makers—handmade goods, prints, custom orders, and resale SKUs. Add category specifics only where the marketplace asks.</p>
+      <p class="setup-lede">Prototype focus: <strong>price sheet</strong> and <strong>paste-ready copy</strong> for makers—handmade goods, prints, custom orders, and things you make or sell. Add category specifics only where the marketplace asks.</p>
       <div id="price-fields" class="price-fields-copy"></div>
       <div class="platform-tabs" role="tablist" aria-label="Marketplace">${platformTabs}</div>
       <div id="platform-packet" class="platform-packet"></div>
@@ -637,16 +665,47 @@ function renderQuote(q: Quote) {
 
 }
 
+function extractionLayerLabel(method: StackLayers["extraction"]): string {
+  switch (method) {
+    case "google_gemma":
+      return "AI title parse (cloud)";
+    case "ollama_gemma":
+      return "AI title parse (local)";
+    default:
+      return "Title rules (no AI parse)";
+  }
+}
+
+function formatStackLayers(q: Quote): string | null {
+  const layers = q.stack_layers;
+  if (!layers) return null;
+  const parts = [
+    extractionLayerLabel(layers.extraction),
+    layers.harness === "mastra" ? "Tool pipeline" : null,
+    layers.pricing === "tabpfn" ? "Smart price model" : "Typical price from similar sales",
+  ];
+  if (layers.comps.serpapi_error) {
+    parts.push("Live listings unavailable (skipped)");
+  } else if (layers.comps.serpapi_skipped_local) {
+    parts.push("Live listings skipped (enough similar sales already)");
+  } else if (layers.comps.serpapi_configured && layers.comps.serpapi === 0) {
+    parts.push("No live listings found");
+  }
+  return parts.filter(Boolean).join(" · ");
+}
+
 function formatCompMeta(q: Quote): string {
   const online = q.comps.filter((c) => c.source === "serpapi").length;
   const examples = q.comps.filter((c) => c.source === "seed").length;
   const saved = q.comps.filter((c) => c.source === "tiger").length;
+  const stackNote = formatStackLayers(q);
   const parts = [
     `${q.comp_count} listing${q.comp_count === 1 ? "" : "s"} shown`,
     online > 0 ? `${online} online now` : null,
     examples > 0 ? `${examples} example${examples === 1 ? "" : "s"} only` : null,
     saved > 0 ? `${saved} from your sales` : null,
     escapeHtml(q.method_label),
+    stackNote ? escapeHtml(stackNote) : null,
   ].filter(Boolean);
   return parts.join(" · ");
 }
