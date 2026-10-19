@@ -28,7 +28,7 @@ Copy `.env.example` → `.env` in the repo root.
 | `GEMMA_MODEL` | Ollama | Pull model: `ollama pull gemma2:2b` | Model name for local Gemma |
 | `DATABASE_URL` | [Tiger Data](https://www.tigerdata.com/) (or any Postgres + pgvector) | Connection string from your DEV service | Comp store + hybrid search |
 | `SERPAPI_KEY` | [SerpApi](https://serpapi.com/) | Dashboard API key | Live marketplace search results |
-| `SERP_MIN_LOCAL_COMPS` | — | Default `6` | Below this many library rows, fetch live listings (cap 5 library rows, so 6 = always Serp when keyed) |
+| `SERP_MIN_LOCAL_COMPS` | — | Legacy, ignored | Serp runs whenever `SERPAPI_KEY` is set; remove `=4` on Render if present |
 | `TABPFN_API_KEY` | [Prior Labs / TabPFN](https://www.priorlabs.ai/) | Platform API key | Tabular price prediction |
 | `SENTRY_DSN` | [Sentry](https://sentry.io/) | Project DSN | Optional tracing |
 | `PORT` | — | Default `8787` | HTTP port |

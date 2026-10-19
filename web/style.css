@@ -230,6 +230,27 @@ body {
   user-select: none;
 }
 
+.site-disclaimer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--muted) 92%, transparent);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.site-disclaimer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.site-disclaimer a:hover {
+  color: var(--copper);
+}
+
 .theme-toggle {
   border: 1px solid var(--line);
   background: var(--bg-elevated);
